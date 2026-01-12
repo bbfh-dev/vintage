@@ -15,7 +15,9 @@ var MainProgram = libparsex.Program{
 	Description: "Minecraft data & resource pack processor designed to not significantly modify the Minecraft syntax while providing useful code generation",
 	Options:     &cli.Main.Options,
 	Args:        &cli.Main.Args,
-	Commands:    []*libparsex.Program{},
+	Commands: []*libparsex.Program{
+		&cli.InitProgram,
+	},
 	EntryPoint: func(raw_args []string) error {
 		if cli.Main.Args.WorkDir != nil {
 			if err := os.Chdir(*cli.Main.Args.WorkDir); err != nil {
