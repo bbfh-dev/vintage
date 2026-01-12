@@ -12,12 +12,14 @@ import (
 
 type Project struct {
 	Meta     *minecraft.PackMcmeta
+	has_icon bool
 	task_err error
 }
 
 func New(mcmeta *minecraft.PackMcmeta) *Project {
 	return &Project{
 		Meta:     mcmeta,
+		has_icon: false,
 		task_err: nil,
 	}
 }
@@ -33,6 +35,7 @@ func (project *Project) Build() error {
 
 	project.do(project.checkBuildDir)
 	project.do(project.clearBuildDir)
+	project.do(project.detectPackIcon)
 
 	if project.task_err != nil {
 		return project.task_err
@@ -83,6 +86,16 @@ func (project *Project) clearBuildDir() error {
 	err := os.MkdirAll(path, os.ModePerm)
 	if err != nil {
 		return errors.NewError(errors.ERR_IO, path, err.Error())
+	}
+
+	return nil
+}
+
+func (project *Project) detectPackIcon() error {
+	_, err := os.Stat("pack.png")
+	if !os.IsNotExist(err) {
+		cli.LogInfo(false, "Found 'pack.png'")
+		project.has_icon = true
 	}
 
 	return nil
