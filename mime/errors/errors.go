@@ -7,8 +7,9 @@ import (
 )
 
 const (
-	ERR_IO   = "I/O Error"
-	ERR_META = "Metadata Error"
+	ERR_IO    = "I/O Error"
+	ERR_META  = "Metadata Error"
+	ERR_VALID = "Validation Error"
 )
 
 type MimeError struct {
