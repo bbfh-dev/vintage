@@ -7,9 +7,10 @@ import (
 )
 
 const (
-	ERR_IO    = "I/O Error"
-	ERR_META  = "Metadata Error"
-	ERR_VALID = "Validation Error"
+	ERR_IO       = "I/O Error"
+	ERR_META     = "Metadata Error"
+	ERR_VALID    = "Validation Error"
+	ERR_INTERNAL = "Internal Error"
 )
 
 type MimeError struct {
