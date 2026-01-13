@@ -32,7 +32,7 @@ func (mcmeta *PackMcmeta) Validate() error {
 func (mcmeta *PackMcmeta) FillVersion(formats map[string]Version) *PackMcmeta {
 	// NOTE: This is not done in [NewPackMeta()] so that the file
 	// can be validated first.
-	mc_version := strings.Split(mcmeta.File.Get("meta.minecraft").String(), "-")
+	mc_version := strings.Split(mcmeta.Minecraft().String(), "-")
 	mcmeta.Versions = VersionRange{
 		Min: formats[mc_version[0]],
 		Max: formats[mc_version[len(mc_version)-1]],

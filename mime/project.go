@@ -41,8 +41,8 @@ func (project *Project) Build() error {
 	cli.LogInfo(
 		false,
 		"Building v%s for Minecraft %s",
-		project.Meta.File.Get("meta.version"),
-		project.Meta.File.Get("meta.minecraft"),
+		project.Meta.Version(),
+		project.Meta.Minecraft(),
 	)
 
 	project.do(project.checkBuildDir)
@@ -327,7 +327,7 @@ func (project *Project) makeZip(folder string) func() error {
 			project.BuildDir,
 			fmt.Sprintf(
 				"%s_%s_v%s.zip",
-				project.Meta.File.Get("meta.name").String(),
+				project.Meta.Name(),
 				label,
 				project.Meta.PrintableVersion(),
 			),
