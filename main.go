@@ -16,7 +16,7 @@ const VERSION = "0.1.0-alpha.1"
 var MainProgram = libparsex.Program{
 	Name:        "mime",
 	Version:     VERSION,
-	Description: "Minecraft data & resource pack processor designed to not significantly modify the Minecraft syntax while providing useful code generation",
+	Description: "Minecraft data & resource pack processor designed to be a useful tool for vanilla development rather than a new scripting language or ecosystem.",
 	Options:     &cli.Main.Options,
 	Args:        &cli.Main.Args,
 	Commands: []*libparsex.Program{
