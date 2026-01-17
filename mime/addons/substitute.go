@@ -116,18 +116,10 @@ func SubstituteItem(body string, path string, env Env) (string, error) {
 	switch {
 
 	case value.IsObject():
-		str, err := SubstituteObject(body, path, env)
-		if err != nil {
-			return body, err
-		}
-		body = str
+		return SubstituteObject(body, path, env)
 
 	case value.IsArray():
-		str, err := SubstituteArray(body, path, env)
-		if err != nil {
-			return body, err
-		}
-		body = str
+		return SubstituteArray(body, path, env)
 
 	case value.Type == gjson.String:
 		str, err := SubstituteString(value.String(), env)
@@ -137,10 +129,7 @@ func SubstituteItem(body string, path string, env Env) (string, error) {
 		if num, err := strconv.Atoi(str); err == nil {
 			return sjson.Set(body, path, num)
 		}
-		body, err = sjson.Set(body, path, str)
-		if err != nil {
-			return body, err
-		}
+		return sjson.Set(body, path, str)
 	}
 
 	return body, nil
