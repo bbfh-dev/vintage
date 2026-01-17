@@ -10,6 +10,7 @@ import (
 
 	"github.com/bbfh-dev/mime/mime/errors"
 	"github.com/bbfh-dev/mime/mime/minecraft"
+	"github.com/tidwall/gjson"
 )
 
 type Columns []string
@@ -38,7 +39,7 @@ func (addon *Addon) Build() error {
 		return errors.NewError(errors.ERR_IO, addon.SourceDir, err.Error())
 	}
 
-	env := map[string][]string{}
+	env := NewEnv()
 
 	for _, entry := range entries {
 		if entry.IsDir() || strings.HasPrefix(entry.Name(), "_") {
@@ -101,12 +102,12 @@ func (addon *Addon) BuildWithIterators(
 	}
 
 	indices := make([]int, len(resolved))
-	env := map[string][]string{}
+	env := NewEnv()
 	n := 0
 
 	for {
 		for i := range resolved {
-			env[identifiers[i]] = resolved[i][indices[i]]
+			env.Iterators[identifiers[i]] = resolved[i][indices[i]]
 		}
 
 		in, err := SubstituteString(name, env)
@@ -118,7 +119,10 @@ func (addon *Addon) BuildWithIterators(
 			)
 		}
 
-		env["i"] = []string{fmt.Sprint(n)}
+		env.Variables["i"] = gjson.Result{
+			Type: gjson.Number,
+			Num:  float64(n),
+		}
 		err = addon.define(in, file, env)
 		if err != nil {
 			return err
@@ -142,7 +146,7 @@ func (addon *Addon) BuildWithIterators(
 	return nil
 }
 
-func (addon *Addon) define(name string, in *minecraft.JsonFile, env map[string][]string) error {
+func (addon *Addon) define(name string, in *minecraft.JsonFile, env Env) error {
 	name = trimExt(name)
 	fmt.Println("$:", name)
 
@@ -152,13 +156,17 @@ func (addon *Addon) define(name string, in *minecraft.JsonFile, env map[string][
 		return err
 	}
 
-	local_env := map[string][]string{}
-	maps.Copy(local_env, env)
+	local_env := NewEnv()
+	maps.Copy(local_env.Iterators, env.Iterators)
+	maps.Copy(local_env.Variables, env.Variables)
 
 	for _, key := range file.Get("@keys").Array() {
-		local_env[key.String()] = []string{file.Get(key.String()).String()}
+		local_env.Variables[key.String()] = file.Get(key.String())
 	}
-	local_env["id"] = []string{name}
+	local_env.Variables["id"] = gjson.Result{
+		Type: gjson.String,
+		Str:  name,
+	}
 
 	for _, path := range addon.Paths {
 		new_path, err := SubstituteString(path, local_env)

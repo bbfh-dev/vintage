@@ -11,7 +11,7 @@ import (
 	"github.com/tidwall/sjson"
 )
 
-func SubstituteString(in string, env map[string][]string) (string, error) {
+func SubstituteString(in string, env Env) (string, error) {
 	var builder strings.Builder
 	reader := bufio.NewReader(strings.NewReader(in))
 	expect_bracket := false
@@ -40,8 +40,13 @@ func SubstituteString(in string, env map[string][]string) (string, error) {
 				parts := strings.SplitN(str, ".", 2)
 				key := parts[0]
 
-				values, ok := env[key]
+				values, ok := env.Iterators[key]
 				if !ok {
+					value, ok := env.Variables[key]
+					if ok {
+						builder.WriteString(value.String())
+						continue
+					}
 					return "", fmt.Errorf("unknown variable %q", key)
 				}
 				if len(parts) == 2 {
@@ -64,13 +69,13 @@ func SubstituteString(in string, env map[string][]string) (string, error) {
 	}
 }
 
-func SubstituteFile(file *minecraft.JsonFile, env map[string][]string) error {
+func SubstituteFile(file *minecraft.JsonFile, env Env) error {
 	body, err := SubstituteObject(string(file.Body), "@this", env)
 	file.Body = []byte(body)
 	return err
 }
 
-func SubstituteObject(body string, path string, env map[string][]string) (string, error) {
+func SubstituteObject(body string, path string, env Env) (string, error) {
 	for _, key := range gjson.Get(body, path+".@keys").Array() {
 		if strings.HasPrefix(key.String(), "$") {
 			path := path + "." + key.String()
@@ -92,7 +97,7 @@ func SubstituteObject(body string, path string, env map[string][]string) (string
 	return body, nil
 }
 
-func SubstituteArray(body string, path string, env map[string][]string) (string, error) {
+func SubstituteArray(body string, path string, env Env) (string, error) {
 	for i := range gjson.Get(body, path).Array() {
 		str, err := SubstituteItem(body, fmt.Sprintf("%s.%d", path, i), env)
 		if err != nil {
@@ -104,7 +109,7 @@ func SubstituteArray(body string, path string, env map[string][]string) (string,
 	return body, nil
 }
 
-func SubstituteItem(body string, path string, env map[string][]string) (string, error) {
+func SubstituteItem(body string, path string, env Env) (string, error) {
 	path = strings.TrimPrefix(path, "@this.")
 	value := gjson.Get(body, path)
 
