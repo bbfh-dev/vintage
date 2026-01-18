@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
 
 	"github.com/bbfh-dev/mime/cli"
 	"github.com/bbfh-dev/mime/mime/errors"
@@ -21,6 +22,7 @@ func (project *Project) runWeld() error {
 	}
 
 	cli.LogInfo(false, "Merging with Smithed Weld")
+	start := time.Now()
 	var errs errgroup.Group
 
 	if _, err = os.Stat(filepath.Join("libs", "data_packs")); err == nil {
@@ -35,7 +37,13 @@ func (project *Project) runWeld() error {
 		})
 	}
 
-	return errs.Wait()
+	err = errs.Wait()
+	if err != nil {
+		return err
+	}
+
+	cli.LogDone(false, "Finished merging in %s", time.Since(start))
+	return nil
 }
 
 func (project *Project) weldPack(dir, zip_name string) error {
@@ -44,6 +52,7 @@ func (project *Project) weldPack(dir, zip_name string) error {
 		return nil
 	}
 
+	start := time.Now()
 	output_name := fmt.Sprintf("weld-%s.zip", dir)
 
 	work_dir, _ := os.Getwd()
@@ -69,8 +78,8 @@ func (project *Project) weldPack(dir, zip_name string) error {
 	if err != nil {
 		return errors.NewError(errors.ERR_IO, path, err.Error())
 	}
-	cli.LogDone(true, "Finished merging %q", zip_name)
 
+	cli.LogDone(true, "Merged %q in %s", zip_name, time.Since(start))
 	return nil
 }
 
