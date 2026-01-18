@@ -11,7 +11,8 @@ import (
 	"github.com/bbfh-dev/mime/mime/minecraft"
 )
 
-var Version = "0.1.0-alpha.1"
+// Use -ldflags="... main.Version=<version here>"
+var Version = "unset"
 
 var MainProgram = libparsex.Program{
 	Name:        "mime",
