@@ -50,7 +50,7 @@ jobs:
 
                   echo "version=$VERSION" >> $GITHUB_OUTPUT
                   echo "ext=$EXT" >> $GITHUB_OUTPUT
-                  echo "binary=myapp-${{ matrix.os }}-${{ matrix.arch }}$EXT" >> $GITHUB_OUTPUT
+                  echo "binary=mime-${{ matrix.os }}-${{ matrix.arch }}$EXT" >> $GITHUB_OUTPUT
 
             - name: Build
               env:
