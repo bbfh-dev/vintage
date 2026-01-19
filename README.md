@@ -24,6 +24,7 @@ Minecraft data & resource pack processor designed to be a useful tool for vanill
 
 - [x] Add weld support
 - [x] Only rebuild parts that changed
+- [ ] Fix cache not being project dependent
 - [ ] Refactor the entire addon system because the code sucks
 - [ ] Add examples
 - [ ] Add tests for all examples

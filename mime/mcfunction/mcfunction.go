@@ -63,7 +63,7 @@ func (fn *McFunction) Parse() error {
 		}
 
 		if strings.HasSuffix(*previous_line, "\\") {
-			fn.Locals[filename] = append(fn.Locals[filename], line)
+			fn.Locals[filename] = append(fn.Locals[filename], "\t"+line)
 			goto next_iteration
 		}
 
