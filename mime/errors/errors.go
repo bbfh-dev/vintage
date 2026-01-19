@@ -13,6 +13,7 @@ const (
 	ERR_INTERNAL = "Internal Error"
 	ERR_ITER     = "Iterator Error"
 	ERR_EXEC     = "Execution Error"
+	ERR_MCFUNC   = "MCFunction Error"
 )
 
 type MimeError struct {
