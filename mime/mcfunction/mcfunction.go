@@ -75,7 +75,7 @@ func (fn *McFunction) Parse() error {
 				*previous_line,
 			))
 		}
-		filename = filepath.Join("data", ResourceToFilepath("function", resource))
+		filename = filepath.Join("data", ResourceToFilepath("function", resource)+".mcfunction")
 		fn.Locals[filename] = append(fn.Locals[filename], line)
 		breadcrumbs = append(breadcrumbs, filename)
 		indents = append(indents, file_indent+line_indent)
