@@ -1,5 +1,6 @@
 # Mime
 
+Minecraft data-driven vanilla data & resource pack development kit powered by pre-processors and generators
 Minecraft data & resource pack processor designed to be a useful tool for vanilla development rather than a new scripting language or ecosystem.
 
 > [!CAUTION]
