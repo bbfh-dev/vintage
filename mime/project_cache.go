@@ -10,6 +10,9 @@ import (
 )
 
 func (project *Project) checkIfCached(folder, lib, zip_name string, value *bool) func() error {
+	if cli.Main.Options.Force {
+		return nil
+	}
 	return func() error {
 		data_timestamp := getMostRecentTimestamp(folder)
 		data_libs_timestamp := getMostRecentTimestamp(filepath.Join("libs", lib))

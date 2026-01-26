@@ -1,5 +1,3 @@
-say Hello World!
-
 execute as @a at @s run function ./_player_tick
 	say 123
 	tp @s ~ ~1 ~

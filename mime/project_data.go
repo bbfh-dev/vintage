@@ -1,12 +1,16 @@
 package mime
 
 import (
+	"bufio"
+	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 
 	liberrors "github.com/bbfh-dev/lib-errors"
 	"github.com/bbfh-dev/mime/cli"
 	"github.com/bbfh-dev/mime/mime/internal"
+	"github.com/bbfh-dev/mime/mime/language"
 	"golang.org/x/sync/errgroup"
 
 	cp "github.com/otiai10/copy"
@@ -45,14 +49,14 @@ func (project *Project) genDataPack() error {
 	var errs errgroup.Group
 
 	for data_entry := range internal.IterateDirsOnly(data_entries) {
-		path = filepath.Join("data", data_entry.Name())
+		path := filepath.Join("data", data_entry.Name())
 		folder_entries, err := os.ReadDir(path)
 		if err != nil {
 			return liberrors.NewIO(err, path)
 		}
 
 		for folder_entry := range internal.IterateDirsOnly(folder_entries) {
-			path = filepath.Join("data", data_entry.Name(), folder_entry.Name())
+			path := filepath.Join("data", data_entry.Name(), folder_entry.Name())
 			switch folder_entry.Name() {
 			case "function", "functions":
 				funcFoldersToParse = append(funcFoldersToParse, path)
@@ -65,26 +69,44 @@ func (project *Project) genDataPack() error {
 		}
 	}
 
-	// for _, path = range funcFoldersToParse {
-	// 	filepath.WalkDir(path, func(path string, entry fs.DirEntry, err error) error {
-	// 		if err != nil || entry.IsDir() {
-	// 			return err
-	// 		}
-	// 		errs.Go(func() error {
-	// 			// return project.parseFunction(path)
-	// 			return nil
-	// 		})
-	// 		return nil
-	// 	})
-	// }
+	for _, path := range funcFoldersToParse {
+		filepath.WalkDir(path, func(path string, entry fs.DirEntry, err error) error {
+			if err != nil || entry.IsDir() {
+				return err
+			}
+			errs.Go(func() error {
+				return project.parseFunction(path)
+			})
+			return nil
+		})
+	}
 
 	if err := errs.Wait(); err != nil {
-		return &liberrors.DetailedError{
-			Label: "Task Error",
-			Context: liberrors.DirContext{
-				Path: internal.ToAbs("data"),
-			},
-			Details: err.Error(),
+		switch err := err.(type) {
+		case *liberrors.DetailedError:
+			return err
+		default:
+			return &liberrors.DetailedError{
+				Label: "Task Error",
+				Context: liberrors.DirContext{
+					Path: internal.ToAbs("data"),
+				},
+				Details: err.Error(),
+			}
+		}
+	}
+
+	for path, lines := range language.Registry {
+		path = filepath.Join(project.BuildDir, "data_pack", path)
+
+		err := os.MkdirAll(filepath.Dir(path), os.ModePerm)
+		if err != nil {
+			return liberrors.NewIO(err, path)
+		}
+
+		err = os.WriteFile(path, []byte(strings.Join(lines, "\n")), os.ModePerm)
+		if err != nil {
+			return liberrors.NewIO(err, path)
 		}
 	}
 
@@ -98,4 +120,16 @@ func (project *Project) genDataPack() error {
 	}
 
 	return nil
+}
+
+func (project *Project) parseFunction(path string) error {
+	file, err := os.OpenFile(path, os.O_RDONLY, os.ModePerm)
+	if err != nil {
+		return liberrors.NewIO(err, path)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	function := language.New(path, scanner, 0)
+	return function.Parse()
 }
