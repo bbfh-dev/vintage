@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/bbfh-dev/mime/cli"
+	"github.com/bbfh-dev/mime/mime/language/templates"
 	"github.com/bbfh-dev/mime/mime/minecraft"
 )
 
@@ -13,6 +14,7 @@ type Project struct {
 	extraFilesToCopy []string
 	isDataCached     bool
 	isAssetsCached   bool
+	inlineTemplates  []*templates.InlineTemplate
 }
 
 func New(mcmeta *minecraft.PackMcmeta) *Project {
@@ -22,6 +24,7 @@ func New(mcmeta *minecraft.PackMcmeta) *Project {
 		extraFilesToCopy: []string{},
 		isDataCached:     false,
 		isAssetsCached:   false,
+		inlineTemplates:  []*templates.InlineTemplate{},
 	}
 }
 
@@ -47,6 +50,7 @@ func (project *Project) Build() error {
 			project.getZipName("RP"),
 			&project.isAssetsCached,
 		),
+		project.loadTemplates,
 		project.genDataPack,
 		project.genResourcePack,
 		project.depend(project.zipPacks, cli.Main.Options.Zip),

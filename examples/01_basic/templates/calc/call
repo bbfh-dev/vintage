@@ -1,0 +1,7 @@
+#!/bin/sh
+
+printf "# OUT: %q\n" "$@"
+
+printf "# NESTED: %s\n" "$(cat)"
+
+printf "DONE"

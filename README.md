@@ -31,6 +31,9 @@ Minecraft data & resource pack processor designed to be a useful tool for vanill
 - [ ] Add tests for all examples
 - [ ] Add tests for the handling of invalid state
 
+- [ ] Add templates
+- [ ] Make mcfunction parsing more advanced
+
 # 1 Features
 
 ## 1.1 Nested functions
@@ -205,4 +208,36 @@ Example:
         }
     ]
 }
+```
+
+```mcfunction
+#!for #y tmp ..5
+    #!for #x tmp ..5
+        say 123
+        #!function ./_sometrhing
+            say "abc"
+            function ./nested
+                say 890
+            say 456
+        say "end"
+```
+
+----
+
+```mcfunction
+scoreboard players set #y tmp 0
+function ./_for_each_y
+    scoreboard players set #x tmp 0
+    function ./_for_each_x
+        say 123
+        function ./_sometrhing
+            say "abc"
+            function ./nested
+                say 890
+            say 456
+        say "end"
+        scoreboard players add #x tmp 1
+        execute if score #x tmp matches ..2 run function ./_for_each_x
+    scoreboard players add #y tmp 1
+    execute if score #y tmp matches ..5 run function ./_for_each_y
 ```

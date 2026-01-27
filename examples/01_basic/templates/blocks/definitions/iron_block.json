@@ -1,0 +1,9 @@
+{
+	"base": "iron_block",
+	"recipe": [
+		{
+			"id": "iron_ingot",
+			"count": 9
+		}
+	]
+}

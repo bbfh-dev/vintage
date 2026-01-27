@@ -1,0 +1,28 @@
+{
+	"type": "generate",
+	"iterators": {
+		"material": [
+			[
+				"oak",
+				"oak_planks",
+				4
+			],
+			[
+				"spruce",
+				"spruce_planks",
+				4
+			],
+			[
+				"stone",
+				"stone",
+				2
+			]
+		],
+		"color": [
+			"red",
+			"green",
+			"blue",
+			"white"
+		]
+	}
+}

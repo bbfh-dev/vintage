@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	liberrors "github.com/bbfh-dev/lib-errors"
+	"github.com/bbfh-dev/mime/mime/language/templates"
 )
 
 type McFunction struct {
@@ -38,7 +39,7 @@ func (fn *McFunction) Parse() error {
 		filename := breadcrumbs[len(breadcrumbs)-1]
 		file_indent := indents[len(indents)-1]
 		line := fn.Scanner.Text()
-		line_indent := getIndentOf(line) - file_indent
+		line_indent := templates.GetIndentOf(line) - file_indent
 		line = strings.TrimSpace(line)
 
 		_, resource := FilepathToResource(fn.Path)
@@ -160,20 +161,6 @@ func ResourceToFilepath(folder_name, resource string) string {
 	}
 
 	return filepath.Join(parts[0], folder_name, parts[1])
-}
-
-func getIndentOf(line string) (indent int) {
-	for _, char := range line {
-		switch char {
-		case ' ':
-			indent++
-		case '\t':
-			indent += 4
-		default:
-			return
-		}
-	}
-	return
 }
 
 func markIndentation(line string) string {
