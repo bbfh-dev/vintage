@@ -45,11 +45,11 @@ func (project *Project) CheckIfCached(value *bool, folder string) internal.Task 
 		libs_folder, zip_path = "resource_packs", project.getZipPath("RP")
 	}
 	return func() error {
-		timestamp := internal.GetMostRecentIn(folder)
-		libs_timestamp := internal.GetMostRecentIn(filepath.Join("libs", libs_folder))
-		if libs_timestamp.Sub(timestamp) > 0 {
-			timestamp = libs_timestamp
-		}
+		timestamp := internal.GetMostRecentIn(
+			folder,
+			filepath.Join("libs", libs_folder),
+			"templates",
+		)
 
 		info, err := os.Stat(zip_path)
 		if err != nil {

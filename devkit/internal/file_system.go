@@ -9,7 +9,18 @@ import (
 	"github.com/bbfh-dev/mime/cli"
 )
 
-func GetMostRecentIn(dir string) time.Time {
+func GetMostRecentIn(dirs ...string) time.Time {
+	timestamp := time.UnixMilli(0)
+	for _, dir := range dirs {
+		new_timestamp := getMostRecent(dir)
+		if new_timestamp.Sub(timestamp) > 0 {
+			timestamp = new_timestamp
+		}
+	}
+	return timestamp
+}
+
+func getMostRecent(dir string) time.Time {
 	latest_time := time.UnixMilli(0)
 	filepath.WalkDir(dir, func(path string, entry fs.DirEntry, err error) error {
 		if err != nil || entry.IsDir() {
