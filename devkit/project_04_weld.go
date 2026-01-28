@@ -55,7 +55,7 @@ func (project *Project) weld(dir, zip_name string) internal.AsyncTask {
 		entries[len(entries)-1] = zip_name
 
 		if len(entries) < 2 {
-			cli.LogDebug(0, "No libraries found for %q", dir)
+			cli.LogDebug(1, "No libraries found for %q. Skipping...", dir)
 			return nil
 		}
 

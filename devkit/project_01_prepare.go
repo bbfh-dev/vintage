@@ -68,5 +68,6 @@ func (project *Project) CheckIfCached(value *bool, folder string) internal.Task 
 }
 
 func (project *Project) LoadTemplates() error {
+	// TODO: this
 	return nil
 }
