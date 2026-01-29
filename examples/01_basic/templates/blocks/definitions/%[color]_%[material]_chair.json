@@ -1,0 +1,9 @@
+{
+	"base": "oak_trapdoor[half=top]",
+	"recipe": [
+		{
+			"id": "%[material.1]",
+			"count": "%[material.2]"
+		}
+	]
+}
