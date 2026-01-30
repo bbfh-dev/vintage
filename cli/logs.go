@@ -3,11 +3,16 @@ package cli
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	libescapes "github.com/bbfh-dev/lib-ansi-escapes"
 )
 
+var mutex sync.Mutex
+
 func LogDebug(nesting uint, format string, args ...any) {
+	mutex.Lock()
+	defer mutex.Unlock()
 	if Main.Options.Debug {
 		// Uses a different format
 		fmt.Println(
@@ -56,6 +61,8 @@ func LogError(nesting uint, format string, args ...any) {
 }
 
 func log(nesting uint, prefix, color, body string) {
+	mutex.Lock()
+	defer mutex.Unlock()
 	fmt.Println(color + arrow(nesting) + prefix + libescapes.ColorReset + body)
 }
 
