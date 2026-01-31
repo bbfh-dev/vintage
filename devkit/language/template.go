@@ -261,19 +261,9 @@ func (template *InlineTemplate) IsArgPassthrough() bool {
 func NewInlineTemplate(dir string, manifest *internal.JsonFile) (*InlineTemplate, error) {
 	template := &InlineTemplate{RequiredArgs: nil}
 
-	if field_args := manifest.Get("arguments"); field_args.Exists() {
+	field_args := manifest.Get("arguments")
+	if field_args.Exists() && field_args.Type != gjson.Null {
 		switch {
-		case field_args.Type == gjson.String:
-			if field_args.String() != "*" {
-				return nil, newSyntaxError(
-					internal.ToAbs(dir),
-					fmt.Sprintf(
-						"field 'arguments' must be an array of strings or equal to '*' (string), but got %q",
-						field_args.String(),
-					),
-				)
-			}
-			template.RequiredArgs = []string{}
 
 		case field_args.IsArray():
 			template.RequiredArgs = []string{}
