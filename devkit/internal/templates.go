@@ -77,7 +77,7 @@ func SimpleSubstitute(in string, env Env) (string, error) {
 							case "to_file_name":
 								var builder strings.Builder
 								for _, char := range out {
-									if unicode.IsLetter(char) || char == '_' {
+									if unicode.IsLetter(char) || char == '_' || char == '+' {
 										builder.WriteRune(char)
 									}
 									if unicode.IsSpace(char) {
