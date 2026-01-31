@@ -35,6 +35,7 @@ func TestExamples(t *testing.T) {
 		assert.NilError(t, os.Chdir(work_dir))
 
 		t.Run(entry.Name(), func(t *testing.T) {
+			cli.Output = t.Output()
 			cli.Main.Args.WorkDir = &path
 			err := devkit.Main([]string{path})
 			assert.NilError(t, err)

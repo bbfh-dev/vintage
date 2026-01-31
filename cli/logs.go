@@ -2,11 +2,15 @@ package cli
 
 import (
 	"fmt"
+	"io"
+	"os"
 	"strings"
 	"sync"
 
 	libescapes "github.com/bbfh-dev/lib-ansi-escapes"
 )
+
+var Output io.Writer = os.Stdout
 
 var mutex sync.Mutex
 
@@ -15,10 +19,11 @@ func LogDebug(nesting uint, format string, args ...any) {
 	defer mutex.Unlock()
 	if Main.Options.Debug {
 		// Uses a different format
-		fmt.Println(
-			libescapes.TextColorWhite +
-				arrow(nesting) +
-				fmt.Sprintf(format, args...) +
+		fmt.Fprintln(
+			Output,
+			libescapes.TextColorWhite+
+				arrow(nesting)+
+				fmt.Sprintf(format, args...)+
 				libescapes.ColorReset,
 		)
 	}
@@ -63,7 +68,10 @@ func LogError(nesting uint, format string, args ...any) {
 func log(nesting uint, prefix, color, body string) {
 	mutex.Lock()
 	defer mutex.Unlock()
-	fmt.Println(color + arrow(nesting) + prefix + libescapes.ColorReset + body)
+	fmt.Fprintln(
+		Output,
+		color+arrow(nesting)+prefix+libescapes.ColorReset+body,
+	)
 }
 
 func arrow(nesting uint) string {
