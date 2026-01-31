@@ -11,11 +11,14 @@ require (
 	github.com/tidwall/pretty v1.2.1
 	github.com/tidwall/sjson v1.2.5
 	golang.org/x/sync v0.19.0
+	gotest.tools v2.2.0+incompatible
 )
 
 require (
+	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/otiai10/mint v1.6.3 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/tidwall/match v1.2.0 // indirect
 	golang.org/x/sys v0.40.0 // indirect
 )
