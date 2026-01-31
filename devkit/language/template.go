@@ -2,7 +2,9 @@ package language
 
 import (
 	"fmt"
+	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -14,6 +16,8 @@ import (
 	"github.com/tidwall/gjson"
 	"golang.org/x/sync/errgroup"
 )
+
+const BODY_SUBSTITUTION = "%[...]"
 
 // ————————————————————————————————
 
@@ -247,6 +251,11 @@ func (template *GeneratorTemplate) defineUsingIterators(
 
 type InlineTemplate struct {
 	RequiredArgs []string
+	Call         func(writer io.Writer, reader io.Reader, args []string) error
+}
+
+func (template *InlineTemplate) IsArgPassthrough() bool {
+	return template.RequiredArgs == nil
 }
 
 func NewInlineTemplate(dir string, manifest *internal.JsonFile) (*InlineTemplate, error) {
@@ -294,7 +303,102 @@ func NewInlineTemplate(dir string, manifest *internal.JsonFile) (*InlineTemplate
 		}
 	}
 
-	return template, nil
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return nil, liberrors.NewIO(err, dir)
+	}
+
+	for _, entry := range entries {
+		switch {
+
+		case strings.HasPrefix(entry.Name(), "call"):
+			path := filepath.Join(dir, entry.Name())
+			template.Call = func(writer io.Writer, reader io.Reader, args []string) error {
+				cmd := exec.Command(path, args...)
+				cmd.Stdin = reader
+				cmd.Stdout = writer
+				cmd.Stderr = os.Stderr
+
+				err := cmd.Run()
+				if err != nil {
+					return &liberrors.DetailedError{
+						Label:   liberrors.ERR_EXECUTE,
+						Context: liberrors.DirContext{Path: path},
+						Details: err.Error(),
+					}
+				}
+				return nil
+			}
+			return template, nil
+
+		case strings.HasSuffix(entry.Name(), ".mcfunction"):
+			body, err := os.ReadFile(filepath.Join(dir, entry.Name()))
+			if err != nil {
+				return nil, liberrors.NewIO(err, internal.ToAbs(dir))
+			}
+			template.Call = func(writer io.Writer, reader io.Reader, args []string) error {
+				env := internal.NewEnv()
+				for i, arg := range args {
+					env.Variables[template.RequiredArgs[i]] = gjson.Result{
+						Type: gjson.String,
+						Str:  arg,
+					}
+				}
+
+				body := string(body)
+				lines := strings.Split(body, "\n")
+
+				var before strings.Builder
+				var after string
+				var ok bool
+				for i, line := range lines {
+					if strings.Contains(line, BODY_SUBSTITUTION) {
+						after = strings.Join(lines[i+1:], "\n")
+						ok = true
+						break
+					}
+					before.WriteString(line + "\n")
+				}
+
+				if ok {
+					str, err := internal.SimpleSubstitute(before.String(), env)
+					if err != nil {
+						return &liberrors.DetailedError{
+							Label:   liberrors.ERR_FORMAT,
+							Context: liberrors.DirContext{Path: filepath.Join(dir, entry.Name())},
+							Details: err.Error(),
+						}
+					}
+					writer.Write([]byte(str))
+
+					io.Copy(writer, reader)
+
+					str, err = internal.SimpleSubstitute(after, env)
+					if err != nil {
+						return &liberrors.DetailedError{
+							Label:   liberrors.ERR_FORMAT,
+							Context: liberrors.DirContext{Path: filepath.Join(dir, entry.Name())},
+							Details: err.Error(),
+						}
+					}
+					writer.Write([]byte(str))
+				}
+
+				return nil
+			}
+
+			return template, nil
+		}
+	}
+
+	return template, &liberrors.DetailedError{
+		Label:   liberrors.ERR_VALIDATE,
+		Context: liberrors.DirContext{Path: internal.ToAbs(dir)},
+		Details: fmt.Sprintf(
+			"template %q contains no logic files. Must contain `*.mcfunction` or `call*`. Refer to documentation",
+			filepath.Base(dir),
+		),
+	}
 }
 
 func newSyntaxError(path string, details string) *liberrors.DetailedError {

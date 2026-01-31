@@ -72,9 +72,7 @@ func (project *Project) parseFunction(path string) error {
 
 	scanner := bufio.NewScanner(file)
 	function := language.NewMcfunction(path, scanner)
-	return internal.Pipeline(
-		function.BuildTree().Parse,
-	)
+	return function.BuildTree().ParseAndSave(project.inlineTemplates)
 }
 
 func (project *Project) writeMcfunctions() error {

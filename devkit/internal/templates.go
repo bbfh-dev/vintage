@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"unicode"
 
 	liberrors "github.com/bbfh-dev/lib-errors"
 	"github.com/tidwall/gjson"
@@ -70,7 +71,29 @@ func SimpleSubstitute(in string, env Env) (string, error) {
 								value.String(),
 							)
 						}
-						builder.WriteString(value.String())
+						out := value.String()
+						if len(parts) == 2 {
+							switch parts[1] {
+							case "to_file_name":
+								var builder strings.Builder
+								for _, char := range out {
+									if unicode.IsLetter(char) || char == '_' {
+										builder.WriteRune(char)
+									}
+									if unicode.IsSpace(char) {
+										builder.WriteRune('_')
+									}
+								}
+								out = builder.String()
+							default:
+								return "", fmt.Errorf(
+									"unknown variable modifier %q from %q",
+									parts[1],
+									str,
+								)
+							}
+						}
+						builder.WriteString(out)
 						continue
 					}
 					return "", fmt.Errorf("unknown variable %q", key)

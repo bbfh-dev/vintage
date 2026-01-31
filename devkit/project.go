@@ -48,9 +48,9 @@ func (project *Project) Build() error {
 		project.CheckIfCached(&project.isDataCached, FOLDER_DATA),
 		project.CheckIfCached(&project.isAssetsCached, FOLDER_ASSETS),
 		project.LoadTemplates,
+		project.GenerateFromTemplates,
 		project.GenerateDataPack,
 		project.GenerateResourcePack,
-		project.GenerateFromTemplates,
 		internal.If[internal.Task](cli.Main.Options.Zip, project.ZipPacks),
 		internal.If[internal.Task](cli.Main.Options.Zip, project.WeldPacks),
 	)

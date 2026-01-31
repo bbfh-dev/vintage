@@ -1,6 +1,8 @@
 package devkit
 
 import (
+	"bufio"
+	"bytes"
 	"os"
 	"path/filepath"
 	"strings"
@@ -8,6 +10,7 @@ import (
 	liberrors "github.com/bbfh-dev/lib-errors"
 	"github.com/bbfh-dev/mime/cli"
 	"github.com/bbfh-dev/mime/devkit/internal"
+	"github.com/bbfh-dev/mime/devkit/language"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -42,15 +45,6 @@ func (project *Project) GenerateFromTemplates() error {
 				}
 
 				for path, file := range tree {
-					new_path, err := internal.SimpleSubstitute(path, definition.Env)
-					if err != nil {
-						return &liberrors.DetailedError{
-							Label:   liberrors.ERR_FORMAT,
-							Context: liberrors.DirContext{Path: path},
-							Details: err.Error(),
-						}
-					}
-
 					file := file.Clone()
 					err = internal.SubstituteGenericFile(file, definition.Env)
 					if err != nil {
@@ -63,15 +57,29 @@ func (project *Project) GenerateFromTemplates() error {
 						}
 					}
 
-					new_path = filepath.Join(project.BuildDir, new_path)
-					if err := os.MkdirAll(filepath.Dir(new_path), os.ModePerm); err != nil {
-						return liberrors.NewIO(err, path)
+					new_path, err := internal.SimpleSubstitute(path, definition.Env)
+					if err != nil {
+						return &liberrors.DetailedError{
+							Label:   liberrors.ERR_FORMAT,
+							Context: liberrors.DirContext{Path: path},
+							Details: err.Error(),
+						}
 					}
 
-					if err := os.WriteFile(new_path, file.Formatted(), os.ModePerm); err != nil {
-						return liberrors.NewIO(err, path)
+					if file.Ext == ".mcfunction" {
+						path = strings.TrimPrefix(path, "data_pack/")
+						scanner := bufio.NewScanner(bytes.NewReader(file.Body))
+						fn := language.NewMcfunction(filepath.Join(root, new_path), scanner)
+						err := fn.BuildTree().ParseAndSave(project.inlineTemplates)
+						if err != nil {
+							return err
+						}
+						continue
 					}
 
+					if err := project.saveFile(path, new_path, file); err != nil {
+						return err
+					}
 					cli.LogDebug(2, "Saved %q", new_path)
 				}
 
@@ -89,6 +97,19 @@ func (project *Project) GenerateFromTemplates() error {
 			template_name,
 			len(template.Definitions),
 		)
+	}
+
+	return nil
+}
+
+func (project *Project) saveFile(path, new_path string, file *internal.GenericFile) error {
+	new_path = filepath.Join(project.BuildDir, new_path)
+	if err := os.MkdirAll(filepath.Dir(new_path), os.ModePerm); err != nil {
+		return liberrors.NewIO(err, path)
+	}
+
+	if err := os.WriteFile(new_path, file.Formatted(), os.ModePerm); err != nil {
+		return liberrors.NewIO(err, path)
 	}
 
 	return nil
