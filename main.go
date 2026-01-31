@@ -2,14 +2,11 @@ package main
 
 import (
 	"os"
-	"path/filepath"
-	"time"
 
 	liberrors "github.com/bbfh-dev/lib-errors"
 	libparsex "github.com/bbfh-dev/lib-parsex/v3"
 	"github.com/bbfh-dev/mime/cli"
 	"github.com/bbfh-dev/mime/devkit"
-	"github.com/bbfh-dev/mime/devkit/minecraft"
 )
 
 // Use -ldflags="... main.Version=<version here>"
@@ -24,38 +21,7 @@ var MainProgram = libparsex.Program{
 	Commands: []*libparsex.Program{
 		&cli.InitProgram,
 	},
-	EntryPoint: func(raw_args []string) error {
-		if cli.Main.Args.WorkDir != nil {
-			if err := os.Chdir(*cli.Main.Args.WorkDir); err != nil {
-				return liberrors.NewIO(err, *cli.Main.Args.WorkDir)
-			}
-		}
-
-		mcmeta_body, err := os.ReadFile("pack.mcmeta")
-		if err != nil {
-			work_dir, _ := os.Getwd()
-			return liberrors.NewIO(err, work_dir)
-		}
-
-		mcmeta := minecraft.NewPackMcmeta(mcmeta_body)
-		if err := mcmeta.Validate(); err != nil {
-			path, _ := filepath.Abs("pack.mcmeta")
-			return &liberrors.DetailedError{
-				Label:   liberrors.ERR_VALIDATE,
-				Context: liberrors.DirContext{Path: path},
-				Details: err.Error(),
-			}
-		}
-
-		start := time.Now()
-		project := devkit.New(mcmeta)
-		if err := project.Build(); err != nil {
-			return err
-		}
-
-		cli.LogDone(0, "Finished building in %s", time.Since(start))
-		return nil
-	},
+	EntryPoint: devkit.Main,
 }
 
 func main() {
