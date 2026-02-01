@@ -2,7 +2,7 @@ package main
 
 import (
 	"os"
-	"runtime"
+	"runtime/debug"
 
 	liberrors "github.com/bbfh-dev/lib-errors"
 	libparsex "github.com/bbfh-dev/lib-parsex/v3"
@@ -10,8 +10,7 @@ import (
 	"github.com/bbfh-dev/mime/devkit"
 )
 
-// Use -ldflags="... main.Version=<version here>"
-var Version = runtime.Version()
+var Version = getVersion()
 
 var MainProgram = libparsex.Program{
 	Name:        "mime",
@@ -26,6 +25,12 @@ var MainProgram = libparsex.Program{
 }
 
 func main() {
+	if Version == "(devel)" {
+		if info, ok := debug.ReadBuildInfo(); ok {
+			Version = info.Main.Version
+		}
+	}
+
 	err := libparsex.Run(&MainProgram, os.Args[1:])
 	if err != nil {
 		switch err := err.(type) {
@@ -38,4 +43,11 @@ func main() {
 		os.Stderr.WriteString("\n")
 		os.Exit(1)
 	}
+}
+
+func getVersion() string {
+	if info, ok := debug.ReadBuildInfo(); ok {
+		return info.Main.Version
+	}
+	return "(devel)"
 }
