@@ -44,6 +44,7 @@ Minecraft data-driven vanilla data & resource pack development kit powered by pr
 # Roadmap before v1
 
 - [ ] Add support for overlays.
+- [ ] Add support for nested inline templates.
 
 # 0 Why it exists
 
