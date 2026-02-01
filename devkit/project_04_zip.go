@@ -62,7 +62,7 @@ func (project *Project) getZipPath(label string) string {
 	return filepath.Join(
 		project.BuildDir,
 		fmt.Sprintf(
-			"%s_[%s]_v%s.zip",
+			"%s_%s_v%s.zip",
 			project.Meta.Name(),
 			label,
 			project.Meta.VersionFormatted(),
