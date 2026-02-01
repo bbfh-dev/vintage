@@ -41,6 +41,10 @@ func (fn *Mcfunction) BuildTree() *Mcfunction {
 		line_indent := internal.GetIndentOf(line) - parent_indent
 		line = strings.TrimSpace(line)
 
+		if line == "" {
+			goto next_iteration
+		}
+
 		if line_indent > 0 {
 			last := fn.current.Nested[len(fn.current.Nested)-1]
 			if strings.HasSuffix(strings.TrimRight(last.Contents, " "), "\\") {
