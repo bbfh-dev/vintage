@@ -42,8 +42,13 @@ func (fn *Mcfunction) BuildTree() *Mcfunction {
 		line = strings.TrimSpace(line)
 
 		if line_indent > 0 {
+			last := fn.current.Nested[len(fn.current.Nested)-1]
+			if strings.HasSuffix(strings.TrimRight(last.Contents, " "), "\\") {
+				line = internal.GetIndentString(line_indent) + line
+				goto next_iteration
+			}
 			indents = append(indents, parent_indent+line_indent)
-			fn.current = fn.current.Nested[len(fn.current.Nested)-1]
+			fn.current = last
 			goto next_iteration
 		}
 
