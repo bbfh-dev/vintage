@@ -78,7 +78,7 @@ func (fn *Mcfunction) parse(
 	indent int,
 ) error {
 	for i, line := range root.Nested {
-		if !strings.HasPrefix(line.Contents, "#!") || line.Contents == "#!" {
+		if !strings.HasPrefix(line.Contents, "#!/") || line.Contents == "#!/" {
 			*out = append(*out, internal.GetIndentString(indent)+line.Contents)
 			if err := fn.parse(templates, out, line, indent+4); err != nil {
 				return err
@@ -86,7 +86,7 @@ func (fn *Mcfunction) parse(
 			continue
 		}
 
-		contents := line.Contents[2:]
+		contents := line.Contents[3:]
 		fields := internal.Fields(contents)
 		name := fields[0]
 

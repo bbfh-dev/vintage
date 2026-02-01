@@ -13,6 +13,7 @@ Minecraft data-driven vanilla data & resource pack development kit powered by pr
 
 <!-- vim-markdown-toc GFM -->
 
+    * [Roadmap before v1](#roadmap-before-v1)
 * [0 Why it exists](#0-why-it-exists)
 * [1 Features](#1-features)
     * [1.1 Relative resource paths](#11-relative-resource-paths)
@@ -39,6 +40,10 @@ Minecraft data-driven vanilla data & resource pack development kit powered by pr
         * [2.2.2 Index](#222-index)
 
 <!-- vim-markdown-toc -->
+
+## Roadmap before v1
+
+- [ ] Add support for overlays.
 
 # 0 Why it exists
 
@@ -227,7 +232,7 @@ Use `%[...]` to place any nested code.
 Example:
 ```mcfunction
 # for/body.mcfunction
-# this is an example '#!for @s my_objective ..5' for-loop implementation
+# this is an example '#!/for @s my_objective ..5' for-loop implementation
 scoreboard players set %[target] %[objective] 0
 function ./_for_each_%[target.to_file_name]
 	%[...]
@@ -249,12 +254,12 @@ cat # this will print all nested code right after
 
 #### 1.4.2.3 Invoking inline templates
 
-While inside of `mcfunction` files, you can use `#!<template_name> <args...>` syntax. The inline template will be written in place of the line.
+While inside of `mcfunction` files, you can use `#!/<template_name> <args...>` syntax. The inline template will be written in place of the line.
 
 Any nested code will be fed to the template.
 
 ```mcfunction
-#!for @s my_objective ..5
+#!/for @s my_objective ..5
     say 123
     say abc
 ```
