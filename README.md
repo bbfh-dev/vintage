@@ -45,6 +45,7 @@ Minecraft data-driven vanilla data & resource pack development kit powered by pr
 
 - [ ] Add support for overlays.
 - [ ] Add support for nested inline templates.
+- [ ] Allow for whitespace in nested code.
 
 # 0 Why it exists
 
