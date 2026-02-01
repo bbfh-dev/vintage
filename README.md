@@ -37,7 +37,7 @@ Minecraft data-driven vanilla data & resource pack development kit powered by pr
         * [2.1.2 Using Go CLI](#212-using-go-cli)
     * [2.2 Usage](#22-usage)
         * [2.2.1 Init](#221-init)
-        * [2.2.2 Index](#222-index)
+        * [2.2.2 Main](#222-main)
 
 <!-- vim-markdown-toc -->
 
@@ -388,7 +388,7 @@ Example usage:
 $ mime init ./examples/01_basic --name=untitled --pack-version=1.0.0 --minecraft=1.21.11 --description "Hello World!"
 ```
 
-### 2.2.2 Index
+### 2.2.2 Main
 
 ```
 Minecraft data-driven vanilla data & resource pack development kit powered by pre-processors and generators
