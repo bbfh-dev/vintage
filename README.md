@@ -39,6 +39,8 @@ Minecraft data-driven vanilla data & resource pack development kit powered by pr
         * [2.2.1 Init](#221-init)
         * [2.2.2 Main](#222-main)
 * [3 Developer notes](#3-developer-notes)
+    * [3.1 Generate for multiple versions](#31-generate-for-multiple-versions)
+    * [3.2 Code validation](#32-code-validation)
 
 <!-- vim-markdown-toc -->
 
@@ -48,6 +50,7 @@ Minecraft data-driven vanilla data & resource pack development kit powered by pr
 - [ ] Add support for nested inline templates.
 - [ ] Allow for whitespace in nested code.
 - [ ] Add more tests.
+- [ ] (Idea) automatically generate overlays / different packs for different versions[⁽¹⁾](#31-generate-for-multiple-versions)
 
 # 0 Why it exists
 
@@ -190,7 +193,7 @@ kill @s
 ### 1.3.1 Name
 
 Field `meta.name` must be a `string`.
-It is used to generate `.zip` files[⁽¹⁾](#22-usage).
+It is used to generate `.zip` files[⁽²⁾](#22-usage).
 
 ### 1.3.2 Minecraft
 
@@ -201,7 +204,7 @@ Field `meta.minecraft` must be one of:
 ### 1.3.3 Version
 
 The project's version. It is recommended to use [semantic versioning](https://semver.org/), it is not enforced.
-It is used to generate `.zip` files[⁽¹⁾](#22-usage).
+It is used to generate `.zip` files[⁽²⁾](#22-usage).
 
 ## 1.4 Templates
 
@@ -471,3 +474,24 @@ $ mime -o /tmp/mime-build --zip --debug ./examples/02_templates
 # 3 Developer notes
 
 - [ ] Refactor template code, because it's scattered around internal, language and mime.
+
+## 3.1 Generate for multiple versions
+
+The idea is to automatically create overlays when possible, separate packs when necessary from a single codebase.
+
+Since minecraft packs keep changing in ways that are hard to keep up with, making this system completely autonomous is too much work.
+
+For this reason, I propose a system that is similar to how Go handles code that should compile differently depending on the target.
+
+Example:
+```bash
+data/example/loot_table/
+    - dir[1.13] # directory for 1.13 only
+    - file.json # default version
+    - file[1.20].json # version for 1.20 only
+    - file[1.19.4].json # version for 1.19.4 only
+```
+
+## 3.2 Code validation
+
+It would be neat if code could be validated for all target Minecraft versions. However, this task is way too much work for not enough to be gained.
