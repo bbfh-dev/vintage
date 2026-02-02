@@ -4,7 +4,7 @@ go 1.25.6
 
 require (
 	github.com/bbfh-dev/lib-errors v1.0.1
-	github.com/bbfh-dev/lib-log v0.1.1-beta.1
+	github.com/bbfh-dev/lib-log v0.1.2-beta.1
 	github.com/bbfh-dev/lib-parsex/v3 v3.0.2-beta.1
 	github.com/otiai10/copy v1.14.1
 	github.com/tidwall/gjson v1.18.0

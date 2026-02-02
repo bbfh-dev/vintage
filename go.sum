@@ -2,8 +2,8 @@ github.com/bbfh-dev/lib-ansi-escapes v0.3.6 h1:Ns0cC2b/UMD1PE1srvvPi1y+j+JskzmeY
 github.com/bbfh-dev/lib-ansi-escapes v0.3.6/go.mod h1:y3dPAVcS/PXHWs851zB/bR3GQx+PyLHsH3HgadfPM+8=
 github.com/bbfh-dev/lib-errors v1.0.1 h1:6INxZsNkczKFIAjf3EeINQa0q8Opk7ArWSmoKiuNfH4=
 github.com/bbfh-dev/lib-errors v1.0.1/go.mod h1:EgNvHHwICMOyRPIU+5KKVOUkQ3eab2CXQdZClngwi10=
-github.com/bbfh-dev/lib-log v0.1.1-beta.1 h1:c3WMaFGGnzIF0akNiuRTyEco/k3qgsH5BlYDndFuHfc=
-github.com/bbfh-dev/lib-log v0.1.1-beta.1/go.mod h1:SdSEmLESydHtTE/9fZvcPNppEduDgRIngK1iQQ2ysRI=
+github.com/bbfh-dev/lib-log v0.1.2-beta.1 h1:5pOXqvt5zOrcSpFUnWRHTpcDq07pDKPH/ZM0cb1iXSE=
+github.com/bbfh-dev/lib-log v0.1.2-beta.1/go.mod h1:SdSEmLESydHtTE/9fZvcPNppEduDgRIngK1iQQ2ysRI=
 github.com/bbfh-dev/lib-parsex/v3 v3.0.2-beta.1 h1:yhBGe68K2hJwtWoJpdhtG29J6wmYE47LfIYul0plW+E=
 github.com/bbfh-dev/lib-parsex/v3 v3.0.2-beta.1/go.mod h1:/qEOPDHo+YcZ29j+b5j8gvrngjfkOlFV6x3XVK9UpKQ=
 github.com/google/go-cmp v0.7.0 h1:wk8382ETsv4JYUZwIsn6YpYiWiBsYLSJiTsyBybVuN8=
