@@ -137,6 +137,25 @@ kill @s
 </td></tr>
 </table>
 
+You are also technically able to define functions from the same file without calling them by using comments:
+
+<table>
+<tr><td>📁 Input</td></tr>
+<tr><td>
+
+```mcfunction
+# function example:any/function/here1
+    say 123
+    kill @s
+
+# function example:any/function/here2
+    say 123
+    kill @s
+```
+
+</td></tr>
+</table>
+
 ## 1.3 Mcmeta generation
 
 `pack.mcmeta` files for both data & resource packs are automatically generated with the appropriate format based on supported Minecraft versions.
@@ -474,6 +493,7 @@ $ mime -o /tmp/mime-build --zip --debug ./examples/02_templates
 # 3 Developer notes
 
 - [ ] Refactor template code, because it's scattered around internal, language and mime.
+- [ ] Add support for `NO_COLOR` and `TERM=dumb` environment variables. Use `"golang.org/x/term" term.IsTerminal(int(os.Stdout.Fd()))`
 
 ## 3.1 Generate for multiple versions
 
