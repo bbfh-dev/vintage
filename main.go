@@ -25,12 +25,6 @@ var MainProgram = libparsex.Program{
 }
 
 func main() {
-	if Version == "(devel)" {
-		if info, ok := debug.ReadBuildInfo(); ok {
-			Version = info.Main.Version
-		}
-	}
-
 	err := libparsex.Run(&MainProgram, os.Args[1:])
 	if err != nil {
 		switch err := err.(type) {
