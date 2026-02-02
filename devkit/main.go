@@ -18,6 +18,10 @@ func Main(raw_args []string) error {
 		}
 	}
 
+	if cli.Main.Options.Debug {
+		liblog.LogLevel = liblog.LEVEL_DEBUG
+	}
+
 	mcmeta_body, err := os.ReadFile("pack.mcmeta")
 	if err != nil {
 		work_dir, _ := os.Getwd()

@@ -23,6 +23,7 @@ func TestExamples(t *testing.T) {
 	assert.NilError(t, err)
 
 	cli.Main.Options.Debug = testing.Verbose()
+	liblog.LogLevel = liblog.LEVEL_DEBUG
 	cli.Main.Options.Force = true
 	cli.Main.Options.Output = filepath.Join(os.TempDir(), "mime-test")
 	cli.Main.Options.Zip = true

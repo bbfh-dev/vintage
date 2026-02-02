@@ -36,6 +36,10 @@ var InitProgram = libparsex.Program{
 			}
 		}
 
+		if Main.Options.Debug {
+			liblog.LogLevel = liblog.LEVEL_DEBUG
+		}
+
 		mcmeta_body, err := os.ReadFile("pack.mcmeta")
 		if err != nil {
 			liblog.Info(0, "Missing existing 'pack.mcmeta', so one will be created instead")
