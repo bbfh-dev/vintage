@@ -5,7 +5,7 @@ go 1.25.6
 require (
 	github.com/bbfh-dev/lib-errors v1.0.2
 	github.com/bbfh-dev/lib-log v0.1.2-beta.2
-	github.com/bbfh-dev/lib-parsex/v3 v3.0.2-beta.1
+	github.com/bbfh-dev/lib-parsex/v3 v3.0.2-beta.3
 	github.com/otiai10/copy v1.14.1
 	github.com/tidwall/gjson v1.18.0
 	github.com/tidwall/pretty v1.2.1
@@ -21,6 +21,6 @@ require (
 	github.com/otiai10/mint v1.6.3 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/tidwall/match v1.2.0 // indirect
-	golang.org/x/sys v0.40.0 // indirect
-	golang.org/x/term v0.39.0 // indirect
+	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/term v0.40.0 // indirect
 )

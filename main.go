@@ -40,8 +40,8 @@ func main() {
 }
 
 func getVersion() string {
-	if info, ok := debug.ReadBuildInfo(); ok {
+	if info, ok := debug.ReadBuildInfo(); ok && info.Main.Version != "" {
 		return info.Main.Version
 	}
-	return "(devel)"
+	return "(dev)"
 }
