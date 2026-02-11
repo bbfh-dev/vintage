@@ -1,9 +1,5 @@
 package minecraft
 
-import (
-	"fmt"
-)
-
 const (
 	USES_SUPPORTED_FORMATS uint8 = 1 + iota
 	USES_MIN_MAX_FORMAT
@@ -25,13 +21,7 @@ func (version PackVersion) Value() any {
 	}
 
 	if version.Digits[1] > 9 {
-		panic(
-			fmt.Sprintf(
-				"(Assertion fail) Version [%d, %d] is not yet supported internally",
-				version.Digits[0],
-				version.Digits[1],
-			),
-		)
+		return float64(version.Digits[0]) + float64(version.Digits[1])/100
 	}
 	return float64(version.Digits[0]) + float64(version.Digits[1])/10
 }
