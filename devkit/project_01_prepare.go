@@ -42,6 +42,7 @@ func (project *Project) CheckIfCached(value *bool, folder string) internal.Task 
 	if cli.Build.Options.Force {
 		return nil
 	}
+
 	var libs_folder, zip_path string
 	switch folder {
 	case FOLDER_DATA:
@@ -49,6 +50,7 @@ func (project *Project) CheckIfCached(value *bool, folder string) internal.Task 
 	case FOLDER_ASSETS:
 		libs_folder, zip_path = "resource_packs", project.getZipPath("RP")
 	}
+
 	return func() error {
 		timestamp := internal.GetMostRecentIn(
 			folder,
