@@ -7,7 +7,7 @@ import (
 	liberrors "github.com/bbfh-dev/lib-errors"
 	liblog "github.com/bbfh-dev/lib-log"
 	"github.com/bbfh-dev/vintage/cli"
-	"github.com/bbfh-dev/vintage/devkit/internal"
+	"github.com/bbfh-dev/vintage/devkit/internal/drive"
 	"github.com/bbfh-dev/vintage/devkit/minecraft"
 )
 
@@ -33,7 +33,7 @@ func Build(raw_args []string) error {
 	if err := mcmeta.Validate(); err != nil {
 		return &liberrors.DetailedError{
 			Label:   liberrors.ERR_VALIDATE,
-			Context: liberrors.DirContext{Path: internal.ToAbs("pack.mcmeta")},
+			Context: liberrors.DirContext{Path: drive.ToAbs("pack.mcmeta")},
 			Details: err.Error(),
 		}
 	}

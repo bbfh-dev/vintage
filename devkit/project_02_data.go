@@ -9,7 +9,7 @@ import (
 
 	liberrors "github.com/bbfh-dev/lib-errors"
 	liblog "github.com/bbfh-dev/lib-log"
-	"github.com/bbfh-dev/vintage/devkit/internal"
+	"github.com/bbfh-dev/vintage/devkit/internal/pipeline"
 	"github.com/bbfh-dev/vintage/devkit/language"
 	"github.com/bbfh-dev/vintage/devkit/minecraft"
 	"golang.org/x/sync/errgroup"
@@ -31,12 +31,12 @@ func (project *Project) GenerateDataPack() error {
 
 	var funcFoldersToParse = []string{}
 
-	return internal.Pipeline(
+	return pipeline.New(
 		project.clearDir(path),
-		internal.Async(
+		pipeline.Async(
 			project.copyPackDirs(FOLDER_DATA, path, &funcFoldersToParse),
 		),
-		internal.Async(
+		pipeline.Async(
 			project.parseMcFunctions(&funcFoldersToParse),
 		),
 		project.copyExtraFiles(path),
@@ -44,7 +44,7 @@ func (project *Project) GenerateDataPack() error {
 	)
 }
 
-func (project *Project) parseMcFunctions(folders *[]string) internal.AsyncTask {
+func (project *Project) parseMcFunctions(folders *[]string) pipeline.AsyncTask {
 	return func(errs *errgroup.Group) error {
 		for _, path := range *folders {
 			filepath.WalkDir(path, func(path string, entry fs.DirEntry, err error) error {

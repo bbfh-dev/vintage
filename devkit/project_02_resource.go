@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	liblog "github.com/bbfh-dev/lib-log"
-	"github.com/bbfh-dev/vintage/devkit/internal"
+	"github.com/bbfh-dev/vintage/devkit/internal/pipeline"
 	"github.com/bbfh-dev/vintage/devkit/minecraft"
 )
 
@@ -23,9 +23,9 @@ func (project *Project) GenerateResourcePack() error {
 	liblog.Info(0, "Creating a Resource Pack")
 	path := filepath.Join(project.BuildDir, "resource_pack")
 
-	return internal.Pipeline(
+	return pipeline.New(
 		project.clearDir(path),
-		internal.Async(
+		pipeline.Async(
 			project.copyPackDirs(FOLDER_ASSETS, path, nil),
 		),
 		project.copyExtraFiles(path),

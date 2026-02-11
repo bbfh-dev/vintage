@@ -12,7 +12,8 @@ import (
 
 	liberrors "github.com/bbfh-dev/lib-errors"
 	liblog "github.com/bbfh-dev/lib-log"
-	"github.com/bbfh-dev/vintage/devkit/internal"
+	"github.com/bbfh-dev/vintage/devkit/internal/drive"
+	"github.com/bbfh-dev/vintage/devkit/internal/pipeline"
 	cp "github.com/otiai10/copy"
 	"golang.org/x/sync/errgroup"
 )
@@ -29,15 +30,13 @@ func (project *Project) WeldPacks() error {
 	}
 
 	liblog.Info(0, "Merging with Smithed Weld")
-	return internal.Pipeline(
-		internal.Async(
-			internal.
-				If[internal.AsyncTask](!project.isDataCached).
+	return pipeline.New(
+		pipeline.Async(
+			pipeline.If[pipeline.AsyncTask](!project.isDataCached).
 				Then(
 					project.weld("data_packs", project.getZipPath("DP")),
 				),
-			internal.
-				If[internal.AsyncTask](!project.isAssetsCached).
+			pipeline.If[pipeline.AsyncTask](!project.isAssetsCached).
 				Then(
 					project.weld("resource_packs", project.getZipPath("RP")),
 				),
@@ -45,7 +44,7 @@ func (project *Project) WeldPacks() error {
 	)
 }
 
-func (project *Project) weld(dir, zip_name string) internal.AsyncTask {
+func (project *Project) weld(dir, zip_name string) pipeline.AsyncTask {
 	return func(errs *errgroup.Group) error {
 		start := time.Now()
 		output_name := fmt.Sprintf("weld-%s.zip", dir)
@@ -98,7 +97,7 @@ func (project *Project) weld(dir, zip_name string) internal.AsyncTask {
 func readLibDir(dir string) ([]string, error) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
-		return nil, liberrors.NewIO(err, internal.ToAbs("libs"))
+		return nil, liberrors.NewIO(err, drive.ToAbs("libs"))
 	}
 
 	files := make([]string, 0, len(entries)+1)

@@ -12,6 +12,7 @@ import (
 	"unicode"
 
 	liberrors "github.com/bbfh-dev/lib-errors"
+	"github.com/bbfh-dev/vintage/devkit/internal/drive"
 	"github.com/tidwall/gjson"
 )
 
@@ -124,15 +125,15 @@ func SimpleSubstitute(in string, env Env) (string, error) {
 	}
 }
 
-func SubstituteJsonFile(file *JsonFile, env Env) error {
+func SubstituteJsonFile(file *drive.JsonFile, env Env) error {
 	return SubstituteObject(file, env, "@this")
 }
 
-func SubstituteGenericFile(file *GenericFile, env Env) error {
+func SubstituteGenericFile(file *drive.GenericFile, env Env) error {
 	switch file.Ext {
 
 	case ".json":
-		json_file := NewJsonFile(file.Body)
+		json_file := drive.NewJsonFile(file.Body)
 		err := SubstituteJsonFile(json_file, env)
 		if err != nil {
 			return err
@@ -150,7 +151,7 @@ func SubstituteGenericFile(file *GenericFile, env Env) error {
 	return nil
 }
 
-func SubstituteObject(file *JsonFile, env Env, path string) error {
+func SubstituteObject(file *drive.JsonFile, env Env, path string) error {
 	for _, key := range file.Get(path + ".@keys").Array() {
 		value := file.Get(join(path, key.String()))
 
@@ -194,7 +195,7 @@ func SubstituteObject(file *JsonFile, env Env, path string) error {
 	return nil
 }
 
-func SubstituteArray(file *JsonFile, env Env, path string) error {
+func SubstituteArray(file *drive.JsonFile, env Env, path string) error {
 	for i, value := range file.Get(path).Array() {
 		switch value.Type {
 		case gjson.Null, gjson.False, gjson.True, gjson.Number:
@@ -224,7 +225,7 @@ func SubstituteArray(file *JsonFile, env Env, path string) error {
 	return nil
 }
 
-func SubstituteString(file *JsonFile, env Env, path string, value gjson.Result) error {
+func SubstituteString(file *drive.JsonFile, env Env, path string, value gjson.Result) error {
 	variables := ExtractVariablesFrom(value.String())
 
 	if !isSmartValue(value.String(), variables) {
@@ -277,8 +278,8 @@ func isSmartValue(value string, variables []string) bool {
 	return len(value) == len("%[")+len(variables[0])+len("]")
 }
 
-func LoadTree(root string, dirs ...[2]string) (map[string]*GenericFile, error) {
-	tree := map[string]*GenericFile{}
+func LoadTree(root string, dirs ...[2]string) (map[string]*drive.GenericFile, error) {
+	tree := map[string]*drive.GenericFile{}
 	var mutex sync.Mutex
 
 	for _, entry := range dirs {
@@ -301,7 +302,7 @@ func LoadTree(root string, dirs ...[2]string) (map[string]*GenericFile, error) {
 			path = filepath.Join(out_dir, path)
 
 			mutex.Lock()
-			tree[path] = NewGenericFile(filepath.Ext(path), data)
+			tree[path] = drive.NewGenericFile(filepath.Ext(path), data)
 			mutex.Unlock()
 
 			return nil

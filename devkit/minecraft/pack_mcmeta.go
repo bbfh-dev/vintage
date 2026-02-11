@@ -5,19 +5,19 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bbfh-dev/vintage/devkit/internal"
+	"github.com/bbfh-dev/vintage/devkit/internal/drive"
 	"github.com/tidwall/gjson"
 )
 
 // pack.mcmeta file util struct
 type PackMcmeta struct {
-	File     *internal.JsonFile
+	File     *drive.JsonFile
 	Versions PackVersionRange
 }
 
 func NewPackMcmeta(body []byte) *PackMcmeta {
 	return &PackMcmeta{
-		File:     internal.NewJsonFile(body),
+		File:     drive.NewJsonFile(body),
 		Versions: PackVersionRange{},
 	}
 }

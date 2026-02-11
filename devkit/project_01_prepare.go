@@ -8,7 +8,8 @@ import (
 	liberrors "github.com/bbfh-dev/lib-errors"
 	liblog "github.com/bbfh-dev/lib-log"
 	"github.com/bbfh-dev/vintage/cli"
-	"github.com/bbfh-dev/vintage/devkit/internal"
+	"github.com/bbfh-dev/vintage/devkit/internal/drive"
+	"github.com/bbfh-dev/vintage/devkit/internal/pipeline"
 	"github.com/bbfh-dev/vintage/devkit/language"
 	"github.com/tidwall/gjson"
 )
@@ -19,7 +20,7 @@ const (
 	FOLDER_ASSETS = "assets"
 )
 
-func (project *Project) LogHeader(header string) internal.Task {
+func (project *Project) LogHeader(header string) pipeline.Task {
 	return func() error {
 		liblog.Info(0, "%s", header)
 		return nil
@@ -38,7 +39,7 @@ func (project *Project) DetectPackIcon() error {
 	return nil
 }
 
-func (project *Project) CheckIfCached(value *bool, folder string) internal.Task {
+func (project *Project) CheckIfCached(value *bool, folder string) pipeline.Task {
 	if cli.Build.Options.Force {
 		return nil
 	}
@@ -52,7 +53,7 @@ func (project *Project) CheckIfCached(value *bool, folder string) internal.Task 
 	}
 
 	return func() error {
-		timestamp := internal.GetMostRecentIn(
+		timestamp := drive.GetMostRecentIn(
 			folder,
 			filepath.Join("libs", libs_folder),
 			"templates",
@@ -89,16 +90,16 @@ func (project *Project) LoadTemplates() error {
 
 	entries, err := os.ReadDir("templates")
 	if err != nil {
-		return liberrors.NewIO(err, internal.ToAbs("templates"))
+		return liberrors.NewIO(err, drive.ToAbs("templates"))
 	}
 
-	for entry := range internal.IterateDirsOnly(entries) {
+	for entry := range drive.IterateDirsOnly(entries) {
 		path := filepath.Join("templates", entry.Name(), "manifest.json")
 		manifest_data, err := os.ReadFile(path)
 		if err != nil {
-			return liberrors.NewIO(err, internal.ToAbs(path))
+			return liberrors.NewIO(err, drive.ToAbs(path))
 		}
-		manifest := internal.NewJsonFile(manifest_data)
+		manifest := drive.NewJsonFile(manifest_data)
 
 		if err := manifest.ExpectField("type", gjson.String); err != nil {
 			return &liberrors.DetailedError{

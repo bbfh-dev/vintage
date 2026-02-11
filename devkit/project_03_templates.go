@@ -10,6 +10,7 @@ import (
 	liberrors "github.com/bbfh-dev/lib-errors"
 	liblog "github.com/bbfh-dev/lib-log"
 	"github.com/bbfh-dev/vintage/devkit/internal"
+	"github.com/bbfh-dev/vintage/devkit/internal/drive"
 	"github.com/bbfh-dev/vintage/devkit/language"
 	"golang.org/x/sync/errgroup"
 )
@@ -102,13 +103,13 @@ func (project *Project) GenerateFromTemplates() error {
 	return nil
 }
 
-func (project *Project) saveFile(path, new_path string, file *internal.GenericFile) error {
+func (project *Project) saveFile(path, new_path string, file *drive.GenericFile) error {
 	new_path = filepath.Join(project.BuildDir, new_path)
 	if err := os.MkdirAll(filepath.Dir(new_path), os.ModePerm); err != nil {
 		return liberrors.NewIO(err, path)
 	}
 
-	if err := os.WriteFile(new_path, file.Formatted(), os.ModePerm); err != nil {
+	if err := os.WriteFile(new_path, file.Contents(), os.ModePerm); err != nil {
 		return liberrors.NewIO(err, path)
 	}
 

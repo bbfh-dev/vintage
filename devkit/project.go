@@ -3,7 +3,7 @@ package devkit
 import (
 	liblog "github.com/bbfh-dev/lib-log"
 	"github.com/bbfh-dev/vintage/cli"
-	"github.com/bbfh-dev/vintage/devkit/internal"
+	"github.com/bbfh-dev/vintage/devkit/internal/pipeline"
 	"github.com/bbfh-dev/vintage/devkit/language"
 	"github.com/bbfh-dev/vintage/devkit/minecraft"
 )
@@ -42,7 +42,7 @@ func (project *Project) Build() error {
 		project.Meta.MinecraftFormatted(),
 	)
 
-	return internal.Pipeline(
+	return pipeline.New(
 		project.LogHeader("Preparing..."),
 		project.DetectPackIcon,
 		project.CheckIfCached(&project.isDataCached, FOLDER_DATA),
@@ -52,11 +52,9 @@ func (project *Project) Build() error {
 		project.GenerateResourcePack,
 		project.GenerateFromTemplates,
 		project.writeMcfunctions,
-		internal.
-			If[internal.Task](cli.Build.Options.Zip).
+		pipeline.If[pipeline.Task](cli.Build.Options.Zip).
 			Then(project.ZipPacks),
-		internal.
-			If[internal.Task](cli.Build.Options.Zip).
+		pipeline.If[pipeline.Task](cli.Build.Options.Zip).
 			Then(project.WeldPacks),
 	)
 }

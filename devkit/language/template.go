@@ -13,6 +13,7 @@ import (
 	liberrors "github.com/bbfh-dev/lib-errors"
 	liblog "github.com/bbfh-dev/lib-log"
 	"github.com/bbfh-dev/vintage/devkit/internal"
+	"github.com/bbfh-dev/vintage/devkit/internal/drive"
 	"github.com/tidwall/gjson"
 	"golang.org/x/sync/errgroup"
 )
@@ -22,7 +23,7 @@ const BODY_SUBSTITUTION = "%[...]"
 // ————————————————————————————————
 
 type Definition struct {
-	File *internal.JsonFile
+	File *drive.JsonFile
 	Env  internal.Env
 }
 
@@ -32,7 +33,7 @@ type GeneratorTemplate struct {
 	Definitions map[string]Definition
 }
 
-func NewGeneratorTemplate(root string, manifest *internal.JsonFile) (*GeneratorTemplate, error) {
+func NewGeneratorTemplate(root string, manifest *drive.JsonFile) (*GeneratorTemplate, error) {
 	template := &GeneratorTemplate{
 		Dir:         root,
 		Iterators:   map[string]internal.Rows{},
@@ -87,7 +88,7 @@ func NewGeneratorTemplate(root string, manifest *internal.JsonFile) (*GeneratorT
 	var errs errgroup.Group
 	var mutex sync.Mutex
 
-	for entry := range internal.IterateFilesOnly(entries) {
+	for entry := range drive.IterateFilesOnly(entries) {
 		errs.Go(func() error {
 			path := filepath.Join(dir, entry.Name())
 			data, err := os.ReadFile(path)
@@ -95,7 +96,7 @@ func NewGeneratorTemplate(root string, manifest *internal.JsonFile) (*GeneratorT
 				return liberrors.NewIO(err, path)
 			}
 
-			file := internal.NewJsonFile(data)
+			file := drive.NewJsonFile(data)
 			mutex.Lock()
 
 			extracted_iters := internal.ExtractVariablesFrom(entry.Name())
@@ -142,7 +143,7 @@ func NewGeneratorTemplate(root string, manifest *internal.JsonFile) (*GeneratorT
 func (template *GeneratorTemplate) defineUsingIterators(
 	name string,
 	iterators []string,
-	file *internal.JsonFile,
+	file *drive.JsonFile,
 ) error {
 	resolved := make([]internal.Rows, len(iterators))
 	identifiers := make([]string, len(iterators))
@@ -258,7 +259,7 @@ func (template *InlineTemplate) IsArgPassthrough() bool {
 	return template.RequiredArgs == nil
 }
 
-func NewInlineTemplate(dir string, manifest *internal.JsonFile) (*InlineTemplate, error) {
+func NewInlineTemplate(dir string, manifest *drive.JsonFile) (*InlineTemplate, error) {
 	template := &InlineTemplate{RequiredArgs: nil}
 
 	field_args := manifest.Get("arguments")
@@ -270,7 +271,7 @@ func NewInlineTemplate(dir string, manifest *internal.JsonFile) (*InlineTemplate
 			for _, value := range field_args.Array() {
 				if value.Type != gjson.String {
 					return nil, newSyntaxError(
-						internal.ToAbs(dir),
+						drive.ToAbs(dir),
 						fmt.Sprintf(
 							"field 'arguments' must be an array of strings, but got (%s) %q",
 							value.Type.String(),
@@ -283,7 +284,7 @@ func NewInlineTemplate(dir string, manifest *internal.JsonFile) (*InlineTemplate
 
 		default:
 			return nil, newSyntaxError(
-				internal.ToAbs(dir),
+				drive.ToAbs(dir),
 				fmt.Sprintf(
 					"field 'arguments' must be an object or equal to '*' (string), but got (%s) %q",
 					field_args.Type.String(),
@@ -324,7 +325,7 @@ func NewInlineTemplate(dir string, manifest *internal.JsonFile) (*InlineTemplate
 		case strings.HasSuffix(entry.Name(), ".mcfunction"):
 			body, err := os.ReadFile(filepath.Join(dir, entry.Name()))
 			if err != nil {
-				return nil, liberrors.NewIO(err, internal.ToAbs(dir))
+				return nil, liberrors.NewIO(err, drive.ToAbs(dir))
 			}
 			template.Call = func(writer io.Writer, reader io.Reader, args []string) error {
 				env := internal.NewEnv()
@@ -383,7 +384,7 @@ func NewInlineTemplate(dir string, manifest *internal.JsonFile) (*InlineTemplate
 
 	return template, &liberrors.DetailedError{
 		Label:   liberrors.ERR_VALIDATE,
-		Context: liberrors.DirContext{Path: internal.ToAbs(dir)},
+		Context: liberrors.DirContext{Path: drive.ToAbs(dir)},
 		Details: fmt.Sprintf(
 			"template %q contains no logic files. Must contain `*.mcfunction` or `call*`. Refer to documentation",
 			filepath.Base(dir),

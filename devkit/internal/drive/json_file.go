@@ -1,4 +1,4 @@
-package internal
+package drive
 
 import (
 	"fmt"
@@ -17,6 +17,14 @@ func NewJsonFile(body []byte) *JsonFile {
 	return &JsonFile{
 		Body: body,
 	}
+}
+
+func (file *JsonFile) Extension() string {
+	return ".json"
+}
+
+func (file *JsonFile) Contents() []byte {
+	return file.Formatted()
 }
 
 func (file *JsonFile) Clone() *JsonFile {

@@ -1,14 +1,15 @@
-package internal
+package pipeline
 
 import (
 	liberrors "github.com/bbfh-dev/lib-errors"
+	"github.com/bbfh-dev/vintage/devkit/internal/drive"
 	"golang.org/x/sync/errgroup"
 )
 
 type Task func() error
 
 // Pipeline calls the functions in order and returns the first encountered error
-func Pipeline(tasks ...Task) error {
+func New(tasks ...Task) error {
 	for _, task := range tasks {
 		if task == nil {
 			continue
@@ -59,7 +60,7 @@ func Async(tasks ...AsyncTask) Task {
 				return &liberrors.DetailedError{
 					Label: "Task Error",
 					Context: liberrors.DirContext{
-						Path: ToAbs("data"),
+						Path: drive.ToAbs("data"),
 					},
 					Details: err.Error(),
 				}

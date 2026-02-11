@@ -8,13 +8,14 @@ import (
 	liberrors "github.com/bbfh-dev/lib-errors"
 	liblog "github.com/bbfh-dev/lib-log"
 	"github.com/bbfh-dev/vintage/cli"
-	"github.com/bbfh-dev/vintage/devkit/internal"
+	"github.com/bbfh-dev/vintage/devkit/internal/drive"
+	"github.com/bbfh-dev/vintage/devkit/internal/pipeline"
 	"github.com/bbfh-dev/vintage/devkit/minecraft"
 	cp "github.com/otiai10/copy"
 	"golang.org/x/sync/errgroup"
 )
 
-func (project *Project) clearDir(path string) internal.Task {
+func (project *Project) clearDir(path string) pipeline.Task {
 	return func() error {
 		err := os.RemoveAll(path)
 		if err != nil {
@@ -33,21 +34,21 @@ func (project *Project) clearDir(path string) internal.Task {
 func (project *Project) copyPackDirs(
 	folder, out_folder string,
 	folders *[]string,
-) internal.AsyncTask {
+) pipeline.AsyncTask {
 	return func(errs *errgroup.Group) error {
 		data_entries, err := os.ReadDir(folder)
 		if err != nil {
-			return liberrors.NewIO(err, internal.ToAbs(folder))
+			return liberrors.NewIO(err, drive.ToAbs(folder))
 		}
 
-		for data_entry := range internal.IterateDirsOnly(data_entries) {
+		for data_entry := range drive.IterateDirsOnly(data_entries) {
 			path := filepath.Join(folder, data_entry.Name())
 			folder_entries, err := os.ReadDir(path)
 			if err != nil {
 				return liberrors.NewIO(err, path)
 			}
 
-			for folder_entry := range internal.IterateDirsOnly(folder_entries) {
+			for folder_entry := range drive.IterateDirsOnly(folder_entries) {
 				path := filepath.Join(folder, data_entry.Name(), folder_entry.Name())
 				switch folder_entry.Name() {
 				case "function", "functions":
@@ -77,7 +78,7 @@ func (project *Project) copyPackDirs(
 	}
 }
 
-func (project *Project) copyExtraFiles(dir string) internal.Task {
+func (project *Project) copyExtraFiles(dir string) pipeline.Task {
 	return func() error {
 		for _, file := range project.extraFilesToCopy {
 			liblog.Debug(1, "Copying extra %q", file)
@@ -91,7 +92,7 @@ func (project *Project) copyExtraFiles(dir string) internal.Task {
 	}
 }
 
-func (project *Project) createPackMcmeta(dir string, ft minecraft.PackFormats) internal.Task {
+func (project *Project) createPackMcmeta(dir string, ft minecraft.PackFormats) pipeline.Task {
 	return func() error {
 		liblog.Info(1, "Exporting pack.mcmeta for %s", dir)
 		mcmeta := project.Meta.Clone()

@@ -1,4 +1,4 @@
-package internal
+package drive
 
 import (
 	"io/fs"
@@ -47,10 +47,7 @@ func ToAbs(path string) string {
 func IterateDirsOnly(entries []os.DirEntry) func(func(os.DirEntry) bool) {
 	return func(yield func(os.DirEntry) bool) {
 		for _, entry := range entries {
-			if !entry.IsDir() {
-				continue
-			}
-			if !yield(entry) {
+			if entry.IsDir() && !yield(entry) {
 				return
 			}
 		}
@@ -60,10 +57,7 @@ func IterateDirsOnly(entries []os.DirEntry) func(func(os.DirEntry) bool) {
 func IterateFilesOnly(entries []os.DirEntry) func(func(os.DirEntry) bool) {
 	return func(yield func(os.DirEntry) bool) {
 		for _, entry := range entries {
-			if entry.IsDir() {
-				continue
-			}
-			if !yield(entry) {
+			if !entry.IsDir() && !yield(entry) {
 				return
 			}
 		}
