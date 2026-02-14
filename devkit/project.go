@@ -17,6 +17,7 @@ type Project struct {
 	isAssetsCached   bool
 
 	generatorTemplates map[string]*templates.GeneratorTemplate
+	collectorTemplates map[string]*templates.CollectorTemplate
 	inlineTemplates    map[string]*templates.InlineTemplate
 }
 
@@ -30,6 +31,7 @@ func New(mcmeta *minecraft.PackMcmeta) *Project {
 		isAssetsCached:   false,
 
 		generatorTemplates: map[string]*templates.GeneratorTemplate{},
+		collectorTemplates: map[string]*templates.CollectorTemplate{},
 		inlineTemplates:    map[string]*templates.InlineTemplate{},
 	}
 }
@@ -52,6 +54,7 @@ func (project *Project) Build() error {
 		project.GenerateResourcePack,
 		project.GenerateFromTemplates,
 		project.writeMcfunctions,
+		// project.CollectFromTemplates,
 		pipeline.If[pipeline.Task](cli.Build.Options.Zip).
 			Then(project.ZipPacks),
 		pipeline.If[pipeline.Task](cli.Build.Options.Zip).

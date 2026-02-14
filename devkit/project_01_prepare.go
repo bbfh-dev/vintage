@@ -130,6 +130,12 @@ func (project *Project) LoadTemplates() error {
 			liblog.Debug(2, "Loaded generator:%s", entry.Name())
 
 		case "collector":
+			template, derr := templates.NewCollectorTemplate(dir, manifest)
+			if derr != nil {
+				return derr
+			}
+			project.collectorTemplates[entry.Name()] = template
+			liblog.Debug(2, "Loaded collector:%s", entry.Name())
 
 		default:
 			return &liberrors.DetailedError{

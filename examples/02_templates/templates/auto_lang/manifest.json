@@ -1,0 +1,7 @@
+{
+	"$schema": "https://bbfh.me/vintage/manifest_schema.json",
+	"type": "collector",
+	"patterns": [
+		"**/*.mcfunction"
+	]
+}
