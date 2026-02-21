@@ -22,11 +22,11 @@ func (project *Project) LoadAutoLibs() error {
 
 	_, err := os.Stat("libs")
 	if os.IsNotExist(err) {
-		liblog.Debug(1, "No libraries found")
+		liblog.Debug(0, "No libraries found")
 		return nil
 	}
 
-	liblog.Info(1, "Loading automatic libraries")
+	liblog.Info(0, "Loading automatic libraries")
 	return pipeline.New(
 		pipeline.Async(
 			pipeline.If[pipeline.AsyncTask](!project.isDataCached).
