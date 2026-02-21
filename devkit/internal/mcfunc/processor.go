@@ -1,6 +1,7 @@
 package mcfunc
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -148,10 +149,19 @@ func (proc *Processor) Inline(input *templates.Buffer) error {
 				}
 			}
 
-			breadcrumbs = append(breadcrumbs, filepath.Join(
-				"data",
-				internal.ResourceToPath("function", resource)+".mcfunction",
-			))
+			path := internal.ResourceToPath("function", resource)
+			if path == "" {
+				return &liberrors.DetailedError{
+					Label:   liberrors.ERR_SYNTAX,
+					Context: proc.makeBufferErrorContext(input, i-1),
+					Details: fmt.Sprintf(
+						"invalid resource %q in the function call",
+						resource,
+					),
+				}
+			}
+
+			breadcrumbs = append(breadcrumbs, filepath.Join("data", path+".mcfunction"))
 			current_indent += line_indent
 			AddLine(breadcrumbs[len(breadcrumbs)-1], clean_line)
 			continue

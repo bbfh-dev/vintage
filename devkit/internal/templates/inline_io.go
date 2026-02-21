@@ -2,17 +2,22 @@ package templates
 
 import (
 	"bufio"
+	"bytes"
+	"io"
+	"strings"
 
 	"github.com/bbfh-dev/vintage/devkit/internal/code"
 )
 
 type Writer interface {
+	io.Writer
 	Writeln(line string)
 }
 
 type Scanner interface {
 	Scan() bool
 	Text() string
+	Reader() io.Reader
 }
 
 // ————————————————————————————————
@@ -42,12 +47,28 @@ func (buffer *Buffer) Scan() bool {
 	return true
 }
 
+func (buffer *Buffer) Reader() io.Reader {
+	var builder strings.Builder
+	for _, line := range buffer.Lines {
+		builder.WriteString(line + "\n")
+	}
+	return strings.NewReader(builder.String())
+}
+
 func (buffer *Buffer) Text() string {
 	return buffer.Lines[buffer.pointer-1]
 }
 
 func (buffer *Buffer) Writeln(line string) {
 	buffer.Lines = append(buffer.Lines, buffer.Indent+line)
+}
+
+func (buffer *Buffer) Write(data []byte) (n int, err error) {
+	scanner := bufio.NewScanner(bytes.NewReader(data))
+	for scanner.Scan() {
+		buffer.Lines = append(buffer.Lines, buffer.Indent+scanner.Text())
+	}
+	return len(data), nil
 }
 
 // ————————————————————————————————

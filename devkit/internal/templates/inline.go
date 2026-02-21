@@ -144,9 +144,8 @@ func inlineTemplateUsingSnippet(template *Inline, path string) (*Inline, error) 
 func inlineTemplateUsingExec(template *Inline, path string) (*Inline, error) {
 	template.Call = func(out Writer, in Scanner, args []string) error {
 		cmd := exec.Command(path, args...)
-		// TODO: this
-		// cmd.Stdin = reader
-		// cmd.Stdout = out
+		cmd.Stdin = in.Reader()
+		cmd.Stdout = out
 		cmd.Stderr = os.Stderr
 
 		err := cmd.Run()

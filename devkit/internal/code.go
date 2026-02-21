@@ -36,7 +36,7 @@ func PathToResource(path string) string {
 func ResourceToPath(folder_name, resource string) string {
 	parts := strings.SplitN(resource, ":", 2)
 	if len(parts) == 1 {
-		panic(fmt.Sprintf("Invalid ResourceToFilepath(%q, %q)", folder_name, resource))
+		return ""
 	}
 	return filepath.Join(parts[0], folder_name, parts[1])
 }
