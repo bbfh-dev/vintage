@@ -29,6 +29,6 @@ func (project *Project) GenerateResourcePack() error {
 			project.copyPackDirs(FOLDER_ASSETS, path, nil),
 		),
 		project.copyExtraFiles(path),
-		project.createPackMcmeta("resource_pack", minecraft.ResourcePackFormats),
+		project.createPackMcmeta("resource_pack", "resources", minecraft.ResourcePackFormats),
 	)
 }

@@ -92,11 +92,11 @@ func (project *Project) copyExtraFiles(dir string) pipeline.Task {
 	}
 }
 
-func (project *Project) createPackMcmeta(dir string, ft minecraft.PackFormats) pipeline.Task {
+func (project *Project) createPackMcmeta(dir, name string, ft minecraft.PackFormats) pipeline.Task {
 	return func() error {
 		liblog.Info(1, "Exporting pack.mcmeta for %s", dir)
 		mcmeta := project.Meta.Clone()
-		mcmeta.FillVersion(ft)
+		mcmeta.FillVersion(name, ft)
 		if err := mcmeta.SaveVersion(); err != nil {
 			liblog.Warn(1, "%s", err.Error())
 		}

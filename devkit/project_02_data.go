@@ -40,7 +40,7 @@ func (project *Project) GenerateDataPack() error {
 			project.parseMcFunctions(&funcFoldersToParse),
 		),
 		project.copyExtraFiles(path),
-		project.createPackMcmeta("data_pack", minecraft.DataPackFormats),
+		project.createPackMcmeta("data_pack", "data", minecraft.DataPackFormats),
 	)
 }
 

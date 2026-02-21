@@ -32,6 +32,9 @@ func IsVersionSupported(version string) bool {
 }
 
 func UsesPluralFolderNames(version string) bool {
+	if version == "" {
+		return false
+	}
 	format, ok := DataPackFormats[version]
 	if !ok {
 		return false

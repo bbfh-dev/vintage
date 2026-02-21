@@ -16,6 +16,7 @@ There are many [other pre-processors](https://gist.github.com/Ellivers/db296c438
 
 ## Roadmap before v1
 
+- [ ] Make libraries and dynamic libraries work
 - [x] Inline templates
 - [ ] Generator templates
 - [ ] Collector templates

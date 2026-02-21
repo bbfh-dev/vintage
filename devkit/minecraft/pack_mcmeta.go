@@ -3,6 +3,7 @@ package minecraft
 import (
 	"errors"
 	"fmt"
+	"math"
 	"strings"
 
 	"github.com/bbfh-dev/vintage/devkit/internal/drive"
@@ -32,17 +33,46 @@ func (mcmeta *PackMcmeta) Validate() error {
 		mcmeta.File.ExpectField("meta.name", gjson.String),
 		mcmeta.File.ExpectField("meta.minecraft", gjson.String, gjson.JSON),
 		mcmeta.File.ExpectField("meta.version", gjson.String),
+		mcmeta.ValidateVersion(),
 	)
+}
+
+func (mcmeta *PackMcmeta) ValidateVersion() error {
+	if mcmeta.Minecraft()[0] != "" {
+		return nil
+	}
+
+	for _, name := range []string{"data", "resources"} {
+		_, ok := mcmeta.MinecraftVersionOverride(name)
+		if !ok {
+			return fmt.Errorf(
+				"meta.minecraft is in manual mode (no .min or .max fields), "+
+					"but 'meta.minecraft.%s_format' is unset. "+
+					"Refer to documentation for additional information",
+				name,
+			)
+		}
+	}
+
+	return nil
 }
 
 // Sets mcmeta.Versions based on provided formats map
 //
 // NOTE: This is not done in [NewPackMeta()] so that the file
 // can be validated first.
-func (mcmeta *PackMcmeta) FillVersion(formats map[string]PackVersion) *PackMcmeta {
+func (mcmeta *PackMcmeta) FillVersion(name string, formats map[string]PackVersion) *PackMcmeta {
 	mc_version := mcmeta.Minecraft()
 	if mc_version[1] == "" {
 		mc_version[1] = mc_version[0]
+	}
+	if mc_version[0] == "" {
+		version, _ := mcmeta.MinecraftVersionOverride(name)
+		mcmeta.Versions = PackVersionRange{
+			Min: version,
+			Max: version,
+		}
+		return mcmeta
 	}
 	mcmeta.Versions = PackVersionRange{
 		Min: formats[mc_version[0]],
@@ -99,6 +129,22 @@ func (mcmeta *PackMcmeta) Minecraft() [2]string {
 	}
 
 	return out
+}
+
+func (mcmeta *PackMcmeta) MinecraftVersionOverride(name string) (PackVersion, bool) {
+	field := mcmeta.File.Get("meta.minecraft." + name + "_format")
+	if !field.Exists() {
+		return PackVersion{}, false
+	}
+
+	scaled := int(math.Round(field.Num * 10))
+	int_part := scaled / 10
+	frac_part := scaled % 10
+
+	return PackVersion{
+		Digits: [2]int{int_part, frac_part},
+		Flag:   USES_MIN_MAX_FORMAT,
+	}, true
 }
 
 func (mcmeta *PackMcmeta) MinecraftFormatted() string {
