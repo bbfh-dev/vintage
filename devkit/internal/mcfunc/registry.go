@@ -3,6 +3,9 @@ package mcfunc
 import (
 	"strings"
 	"sync"
+
+	liblog "github.com/bbfh-dev/lib-log"
+	"github.com/bbfh-dev/vintage/devkit/internal"
 )
 
 var UsedNamespaces = map[string]byte{}
@@ -17,6 +20,7 @@ func AddLine(path string, line string) error {
 	lines, ok := Registry[path]
 	if !ok {
 		Registry[path] = []string{}
+		liblog.Debug(3, "Created %q", internal.PathToResource(path))
 	}
 
 	collectNamespaces(line)

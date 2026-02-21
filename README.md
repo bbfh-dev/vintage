@@ -17,6 +17,6 @@ There are many [other pre-processors](https://gist.github.com/Ellivers/db296c438
 ## Roadmap before v1
 
 - [x] Inline templates
-- [ ] Generator templates
+- [x] Generator templates
 - [ ] Collector templates
 - [ ] Better examples

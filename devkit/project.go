@@ -58,7 +58,7 @@ func (project *Project) Build() error {
 		project.LoadTemplates,
 		project.GenerateDataPack,
 		project.GenerateResourcePack,
-		project.GenerateFromTemplates,
+		pipeline.Async(project.GenerateFromTemplates),
 		project.writeMcfunctions,
 		// project.CollectFromTemplates,
 		project.LoadAutoLibs,

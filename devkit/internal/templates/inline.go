@@ -153,7 +153,7 @@ func inlineTemplateUsingExec(template *Inline, path string) (*Inline, error) {
 		cmd.Stdout = out
 		cmd.Stderr = &stderr
 
-		path = fmt.Sprintf("%s with [%s]", path, strings.Join(args, " "))
+		path := fmt.Sprintf("%s with [%s]", path, strings.Join(args, " "))
 
 		err := cmd.Run()
 		if err != nil {
