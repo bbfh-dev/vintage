@@ -13,3 +13,10 @@ There are many [other pre-processors](https://gist.github.com/Ellivers/db296c438
 1. No [vendor lock-in](https://en.wikipedia.org/wiki/Vendor_lock-in) to specific language.[⁽²⁾](https://github.com/bbfh-dev/vintage/wiki/Philosophy#2-no-vendor-lock-in-to-specific-language)
 1. Power thanks to simplicity not over-engineering.[⁽³⁾](https://github.com/bbfh-dev/vintage/wiki/Philosophy#3-power-thanks-to-simplicity-not-over-engineering)
 1. User-control and predictability.[⁽⁴⁾](https://github.com/bbfh-dev/vintage/wiki/Philosophy#4-user-control-and-predictability)
+
+## Roadmap before v1
+
+- [x] Inline templates
+- [ ] Generator templates
+- [ ] Collector templates
+- [ ] Better examples
