@@ -53,6 +53,17 @@ func (project *Project) CheckIfCached(value *bool, folder string) pipeline.Task 
 	}
 
 	return func() error {
+		if _, err := os.Stat(folder); os.IsNotExist(err) {
+			*value = true
+			liblog.Warn(
+				1,
+				"%q cannot be created, there is no %q folder",
+				filepath.Base(zip_path),
+				folder,
+			)
+			return nil
+		}
+
 		timestamp := drive.GetMostRecentIn(
 			folder,
 			filepath.Join("libs", libs_folder),
