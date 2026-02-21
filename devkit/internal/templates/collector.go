@@ -11,14 +11,14 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-type CollectorTemplate struct {
+type Collector struct {
 	Root      string
 	Patterns  []string
 	Collector string
 }
 
-func NewCollectorTemplate(root string, manifest *drive.JsonFile) (*CollectorTemplate, error) {
-	template := &CollectorTemplate{
+func NewCollector(root string, manifest *drive.JsonFile) (*Collector, error) {
+	template := &Collector{
 		Root:     root,
 		Patterns: []string{},
 	}

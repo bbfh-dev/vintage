@@ -21,14 +21,14 @@ type Definition struct {
 	Env  code.Env
 }
 
-type GeneratorTemplate struct {
+type Generator struct {
 	Root        string
 	Iterators   map[string]code.Rows
 	Definitions map[string]Definition
 }
 
-func NewGeneratorTemplate(root string, manifest *drive.JsonFile) (*GeneratorTemplate, error) {
-	template := &GeneratorTemplate{
+func NewGenerator(root string, manifest *drive.JsonFile) (*Generator, error) {
+	template := &Generator{
 		Root:        root,
 		Iterators:   map[string]code.Rows{},
 		Definitions: map[string]Definition{},
@@ -126,7 +126,7 @@ func NewGeneratorTemplate(root string, manifest *drive.JsonFile) (*GeneratorTemp
 	return template, nil
 }
 
-func (template *GeneratorTemplate) defineUsingIterators(
+func (template *Generator) defineUsingIterators(
 	name string,
 	iterators []string,
 	file *drive.JsonFile,

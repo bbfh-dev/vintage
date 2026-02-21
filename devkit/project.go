@@ -3,6 +3,7 @@ package devkit
 import (
 	liblog "github.com/bbfh-dev/lib-log"
 	"github.com/bbfh-dev/vintage/cli"
+	"github.com/bbfh-dev/vintage/devkit/internal/mcfunc"
 	"github.com/bbfh-dev/vintage/devkit/internal/pipeline"
 	"github.com/bbfh-dev/vintage/devkit/internal/templates"
 	"github.com/bbfh-dev/vintage/devkit/minecraft"
@@ -16,9 +17,9 @@ type Project struct {
 	isDataCached     bool
 	isAssetsCached   bool
 
-	generatorTemplates map[string]*templates.GeneratorTemplate
-	collectorTemplates map[string]*templates.CollectorTemplate
-	inlineTemplates    map[string]*templates.InlineTemplate
+	generatorTemplates map[string]*templates.Generator
+	collectorTemplates map[string]*templates.Collector
+	inlineTemplates    map[string]*templates.Inline
 }
 
 func New(mcmeta *minecraft.PackMcmeta) *Project {
@@ -30,9 +31,9 @@ func New(mcmeta *minecraft.PackMcmeta) *Project {
 		isDataCached:     false,
 		isAssetsCached:   false,
 
-		generatorTemplates: map[string]*templates.GeneratorTemplate{},
-		collectorTemplates: map[string]*templates.CollectorTemplate{},
-		inlineTemplates:    map[string]*templates.InlineTemplate{},
+		generatorTemplates: map[string]*templates.Generator{},
+		collectorTemplates: map[string]*templates.Collector{},
+		inlineTemplates:    map[string]*templates.Inline{},
 	}
 }
 
@@ -60,4 +61,8 @@ func (project *Project) Build() error {
 		pipeline.If[pipeline.Task](cli.Build.Options.Zip).
 			Then(project.WeldPacks),
 	)
+}
+
+func Reset() {
+	mcfunc.Registry = map[string][]string{}
 }

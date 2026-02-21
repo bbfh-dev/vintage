@@ -1,4 +1,4 @@
-package language
+package mcfunc
 
 import (
 	"fmt"
@@ -18,5 +18,18 @@ func Add(path string, lines []string) error {
 	}
 
 	Registry[path] = lines
+	return nil
+}
+
+func AddLine(path string, line string) error {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	lines, ok := Registry[path]
+	if !ok {
+		Registry[path] = []string{}
+	}
+
+	Registry[path] = append(lines, line)
 	return nil
 }

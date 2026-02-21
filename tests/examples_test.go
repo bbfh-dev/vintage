@@ -8,7 +8,6 @@ import (
 	liblog "github.com/bbfh-dev/lib-log"
 	"github.com/bbfh-dev/vintage/cli"
 	"github.com/bbfh-dev/vintage/devkit"
-	"github.com/bbfh-dev/vintage/devkit/language"
 	"gotest.tools/assert"
 )
 
@@ -32,7 +31,7 @@ func TestExamples(t *testing.T) {
 		path := filepath.Join("examples", entry.Name())
 
 		// Reset
-		language.Registry = map[string][]string{}
+		devkit.Reset()
 		assert.NilError(t, os.RemoveAll(cli.Build.Options.Output))
 		assert.NilError(t, os.Chdir(work_dir))
 

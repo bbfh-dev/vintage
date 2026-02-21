@@ -1,6 +1,7 @@
 package devkit
 
 import (
+	"bufio"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -8,8 +9,8 @@ import (
 
 	liberrors "github.com/bbfh-dev/lib-errors"
 	liblog "github.com/bbfh-dev/lib-log"
+	"github.com/bbfh-dev/vintage/devkit/internal/mcfunc"
 	"github.com/bbfh-dev/vintage/devkit/internal/pipeline"
-	"github.com/bbfh-dev/vintage/devkit/language"
 	"github.com/bbfh-dev/vintage/devkit/minecraft"
 	"golang.org/x/sync/errgroup"
 )
@@ -68,15 +69,19 @@ func (project *Project) parseFunction(path string) error {
 	}
 	defer file.Close()
 
-	// TODO: this
-	// scanner := bufio.NewScanner(file)
-	// function := language.NewMcfunction(path, scanner)
-	// return function.BuildTree().ParseAndSave(project.inlineTemplates)
+	scanner := bufio.NewScanner(file)
+	fn := mcfunc.New(path, scanner, project.inlineTemplates)
+	proc := mcfunc.NewProcessor(fn)
+
+	if err := proc.Build(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (project *Project) writeMcfunctions() error {
-	for path, lines := range language.Registry {
+	for path, lines := range mcfunc.Registry {
 		path = filepath.Join(project.BuildDir, "data_pack", path)
 
 		err := os.MkdirAll(filepath.Dir(path), os.ModePerm)

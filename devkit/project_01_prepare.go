@@ -114,7 +114,7 @@ func (project *Project) LoadTemplates() error {
 		switch template_type {
 
 		case "inline":
-			template, derr := templates.NewInlineTemplate(dir, manifest)
+			template, derr := templates.NewInline(dir, manifest)
 			if derr != nil {
 				return derr
 			}
@@ -122,7 +122,7 @@ func (project *Project) LoadTemplates() error {
 			liblog.Debug(2, "Loaded inline:%s", entry.Name())
 
 		case "generator":
-			template, derr := templates.NewGeneratorTemplate(dir, manifest)
+			template, derr := templates.NewGenerator(dir, manifest)
 			if derr != nil {
 				return derr
 			}
@@ -130,7 +130,7 @@ func (project *Project) LoadTemplates() error {
 			liblog.Debug(2, "Loaded generator:%s", entry.Name())
 
 		case "collector":
-			template, derr := templates.NewCollectorTemplate(dir, manifest)
+			template, derr := templates.NewCollector(dir, manifest)
 			if derr != nil {
 				return derr
 			}
