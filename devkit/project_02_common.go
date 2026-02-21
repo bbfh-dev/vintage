@@ -48,8 +48,17 @@ func (project *Project) copyPackDirs(
 				return liberrors.NewIO(err, path)
 			}
 
-			for folder_entry := range drive.IterateDirsOnly(folder_entries) {
+			for _, folder_entry := range folder_entries {
 				path := filepath.Join(folder, data_entry.Name(), folder_entry.Name())
+
+				if !folder_entry.IsDir() {
+					liblog.Debug(1, "Copying file %q", path)
+					errs.Go(func() error {
+						return cp.Copy(path, filepath.Join(out_folder, path))
+					})
+					continue
+				}
+
 				switch folder_entry.Name() {
 				case "function", "functions":
 					if folders != nil {
