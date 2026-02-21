@@ -1,3 +1,4 @@
+// TODO: Refactor this entire monstrosity
 package autolibs
 
 import (
@@ -146,6 +147,7 @@ func (lib *Library) Install() error {
 }
 
 func (lib *Library) Manage() error {
+	// TODO: Check if the files actually exist
 	if lib.IsUsed() {
 		if err := lib.Install(); err != nil {
 			return err
