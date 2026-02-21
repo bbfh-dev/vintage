@@ -3,6 +3,7 @@ package devkit
 import (
 	liblog "github.com/bbfh-dev/lib-log"
 	"github.com/bbfh-dev/vintage/cli"
+	"github.com/bbfh-dev/vintage/devkit/internal/autolibs"
 	"github.com/bbfh-dev/vintage/devkit/internal/mcfunc"
 	"github.com/bbfh-dev/vintage/devkit/internal/pipeline"
 	"github.com/bbfh-dev/vintage/devkit/internal/templates"
@@ -20,6 +21,8 @@ type Project struct {
 	generatorTemplates map[string]*templates.Generator
 	collectorTemplates map[string]*templates.Collector
 	inlineTemplates    map[string]*templates.Inline
+
+	libraries []*autolibs.Library
 }
 
 func New(mcmeta *minecraft.PackMcmeta) *Project {
@@ -34,6 +37,8 @@ func New(mcmeta *minecraft.PackMcmeta) *Project {
 		generatorTemplates: map[string]*templates.Generator{},
 		collectorTemplates: map[string]*templates.Collector{},
 		inlineTemplates:    map[string]*templates.Inline{},
+
+		libraries: []*autolibs.Library{},
 	}
 }
 
@@ -56,6 +61,8 @@ func (project *Project) Build() error {
 		project.GenerateFromTemplates,
 		project.writeMcfunctions,
 		// project.CollectFromTemplates,
+		project.LoadAutoLibs,
+		project.ManageAutoLibs,
 		pipeline.If[pipeline.Task](cli.Build.Options.Zip).
 			Then(project.ZipPacks),
 		pipeline.If[pipeline.Task](cli.Build.Options.Zip).
@@ -64,5 +71,6 @@ func (project *Project) Build() error {
 }
 
 func Reset() {
+	mcfunc.UsedNamespaces = map[string]byte{}
 	mcfunc.Registry = map[string][]string{}
 }

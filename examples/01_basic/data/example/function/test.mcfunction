@@ -9,4 +9,4 @@ function ./_greet
 
 execute as @e \
 	at @s \
-	run say Hi
+	run function bs.math:some_function/here

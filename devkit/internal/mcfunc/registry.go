@@ -1,25 +1,14 @@
 package mcfunc
 
 import (
-	"fmt"
+	"strings"
 	"sync"
 )
 
+var UsedNamespaces = map[string]byte{}
 var Registry = map[string][]string{}
 
 var mutex = sync.Mutex{}
-
-func Add(path string, lines []string) error {
-	mutex.Lock()
-	defer mutex.Unlock()
-
-	if _, ok := Registry[path]; ok {
-		return fmt.Errorf("function %q is already defined", path)
-	}
-
-	Registry[path] = lines
-	return nil
-}
 
 func AddLine(path string, line string) error {
 	mutex.Lock()
@@ -30,6 +19,16 @@ func AddLine(path string, line string) error {
 		Registry[path] = []string{}
 	}
 
+	collectNamespaces(line)
 	Registry[path] = append(lines, line)
 	return nil
+}
+
+func collectNamespaces(line string) {
+	for field := range strings.FieldsSeq(line) {
+		before, after, ok := strings.Cut(field, ":")
+		if ok && after != "" && strings.ToLower(before) == before {
+			UsedNamespaces[before] = 1
+		}
+	}
 }
