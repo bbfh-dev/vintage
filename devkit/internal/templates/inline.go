@@ -1,6 +1,8 @@
 package templates
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -8,6 +10,7 @@ import (
 	"strings"
 
 	liberrors "github.com/bbfh-dev/lib-errors"
+	liblog "github.com/bbfh-dev/lib-log"
 	"github.com/bbfh-dev/vintage/devkit/internal/code"
 	"github.com/bbfh-dev/vintage/devkit/internal/drive"
 	"github.com/tidwall/gjson"
@@ -143,17 +146,36 @@ func inlineTemplateUsingSnippet(template *Inline, path string) (*Inline, error) 
 
 func inlineTemplateUsingExec(template *Inline, path string) (*Inline, error) {
 	template.Call = func(out Writer, in Scanner, args []string) error {
+		var stderr bytes.Buffer
+
 		cmd := exec.Command(path, args...)
 		cmd.Stdin = in.Reader()
 		cmd.Stdout = out
-		cmd.Stderr = os.Stderr
+		cmd.Stderr = &stderr
+
+		path = fmt.Sprintf("%s with [%s]", path, strings.Join(args, " "))
 
 		err := cmd.Run()
 		if err != nil {
 			return &liberrors.DetailedError{
-				Label:   liberrors.ERR_EXECUTE,
-				Context: liberrors.DirContext{Path: path},
+				Label: liberrors.ERR_EXECUTE,
+				Context: liberrors.FileContext{
+					Trace: []liberrors.TraceItem{{Name: path, Col: -1, Row: -1}},
+					Buffer: liberrors.Buffer{
+						FirstLine:   0,
+						Buffer:      "",
+						Highlighted: stderr.String(),
+					},
+				},
 				Details: err.Error(),
+			}
+		}
+
+		if stderr.Len() != 0 {
+			liblog.Error(1, "From: %s", path)
+			scanner := bufio.NewScanner(&stderr)
+			for scanner.Scan() {
+				liblog.Error(2, "%s", scanner.Text())
 			}
 		}
 
