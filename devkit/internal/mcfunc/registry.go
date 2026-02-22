@@ -32,7 +32,7 @@ func collectNamespaces(line string) {
 	for field := range strings.FieldsSeq(line) {
 		before, after, ok := strings.Cut(field, ":")
 		if ok && after != "" && strings.ToLower(before) == before {
-			UsedNamespaces[before] = 1
+			UsedNamespaces[strings.TrimPrefix(before, "#")] = 1
 		}
 	}
 }
