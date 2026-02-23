@@ -73,6 +73,8 @@ func SubstituteString(in string, env Env) (string, error) {
 					out := value.String()
 					out = strings.ReplaceAll(out, "\t", "")
 					out = strings.ReplaceAll(out, " ", "")
+					out = strings.ReplaceAll(out, "\r", "")
+					out = strings.ReplaceAll(out, "\n", "")
 					builder.WriteString(out)
 					continue
 				}
