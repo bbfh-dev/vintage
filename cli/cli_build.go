@@ -7,6 +7,7 @@ var Build struct {
 		Debug            bool   `alt:"d" desc:"Print verbose debug information"`
 		Force            bool   `alt:"f" desc:"Force build even if the project was cached"`
 		DeleteUnusedLibs bool   `desc:"Delete unused automatic libraries rather than appending .disabled to file names"`
+		ForceStringify   bool   `desc:"Forces variables in templates to be inserted even if they are of an unsupported type"`
 	}
 	Args struct {
 		WorkDir *string

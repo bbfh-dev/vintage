@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/bbfh-dev/vintage/cli"
 	"github.com/bbfh-dev/vintage/devkit/internal/drive"
 	"github.com/tidwall/gjson"
 )
@@ -68,6 +69,14 @@ func SubstituteString(in string, env Env) (string, error) {
 				value = Query(value, parts[1])
 			}
 			if !IsStringifiable(value) {
+				if cli.Build.Options.ForceStringify {
+					out := value.String()
+					out = strings.ReplaceAll(out, "\t", "")
+					out = strings.ReplaceAll(out, " ", "")
+					builder.WriteString(out)
+					continue
+				}
+
 				return "", fmt.Errorf(
 					"simple subtitution only supports primitive datatypes, got (%s) %q",
 					TypeOf(value),
