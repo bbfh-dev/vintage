@@ -1,7 +1,6 @@
 package code
 
 import (
-	"bufio"
 	"fmt"
 	"strconv"
 	"strings"
@@ -13,81 +12,93 @@ import (
 
 func SubstituteString(in string, env Env) (string, error) {
 	var builder strings.Builder
-	reader := bufio.NewReader(strings.NewReader(in))
-	expect_bracket := false
+	var err error
+	builder.Grow(len(in))
+	i := 0
 
-	for {
-		char, _, err := reader.ReadRune()
-		if err != nil {
-			return builder.String(), nil
+	for i < len(in) {
+		if in[i] != '%' {
+			builder.WriteByte(in[i])
+			i++
+			continue
+		}
+		i++ // skip '%'
+
+		if i >= len(in) {
+			builder.WriteByte('%')
+			break
+		}
+		if in[i] != '[' {
+			builder.WriteByte('%')
+			builder.WriteByte(in[i])
+			i++
+			continue
+		}
+		i++ // skip '['
+
+		// find closing ']'
+		start := i
+		for i < len(in) && in[i] != ']' {
+			i++
+		}
+		if i >= len(in) {
+			return "", fmt.Errorf("unclosed placeholder")
+		}
+		placeholder := in[start:i]
+		i++ // skip ']'
+
+		before, after, ok := strings.Cut(placeholder, ".")
+		var key, suffix string
+		if !ok {
+			key = placeholder
+		} else {
+			key = before
+			suffix = after
 		}
 
-		switch {
-
-		case char == '%':
-			expect_bracket = true
-
-		case !expect_bracket:
-			builder.WriteRune(char)
-
-		case char != '[':
-			expect_bracket = false
-			builder.WriteRune('%')
-			builder.WriteRune(char)
-
-		default:
-			expect_bracket = false
-			str, err := reader.ReadString(']')
-			if err != nil {
-				return builder.String(), err
-			}
-			str = strings.TrimSuffix(str, "]")
-
-			parts := strings.SplitN(str, ".", 2)
-			key := parts[0]
-
-			if values, ok := env.Iterators[key]; ok {
-				index := 0
-				if len(parts) == 2 {
-					index, err = strconv.Atoi(parts[1])
-					if err != nil {
-						return "", err
-					}
-					if index >= len(values) {
-						return "", fmt.Errorf("index %d out of range of %#v", index, values)
-					}
+		if values, ok := env.Iterators[key]; ok {
+			index := 0
+			if suffix != "" {
+				index, err = strconv.Atoi(suffix)
+				if err != nil {
+					return "", err
 				}
-				builder.WriteString(values[index])
+				if index >= len(values) {
+					return "", fmt.Errorf("index %d out of range of %#v", index, values)
+				}
+			}
+			builder.WriteString(values[index])
+			continue
+		}
+
+		value, ok := env.Variables[key]
+		if !ok {
+			return "", fmt.Errorf("unknown variable %q", key)
+		}
+		if suffix != "" {
+			value = Query(value, suffix)
+		}
+		if !IsStringifiable(value) {
+			if cli.Build.Options.ForceStringify {
+				out := value.String()
+				out = strings.ReplaceAll(out, "\t", "")
+				out = strings.ReplaceAll(out, " ", "")
+				out = strings.ReplaceAll(out, "\r", "")
+				out = strings.ReplaceAll(out, "\n", "")
+				builder.WriteString(out)
 				continue
 			}
 
-			value, ok := env.Variables[key]
-			if !ok {
-				return "", fmt.Errorf("unknown variable %q", key)
-			}
-			if len(parts) == 2 {
-				value = Query(value, parts[1])
-			}
-			if !IsStringifiable(value) {
-				if cli.Build.Options.ForceStringify {
-					out := value.String()
-					out = strings.ReplaceAll(out, "\t", "")
-					out = strings.ReplaceAll(out, " ", "")
-					out = strings.ReplaceAll(out, "\r", "")
-					out = strings.ReplaceAll(out, "\n", "")
-					builder.WriteString(out)
-					continue
-				}
-
-				return "", fmt.Errorf(
-					"simple subtitution only supports primitive datatypes, got (%s) %q",
-					TypeOf(value),
-					value,
-				)
-			}
-			builder.WriteString(value.String())
+			return "", fmt.Errorf(
+				"simple subtitution only supports primitive datatypes, got (%s) %q",
+				TypeOf(value),
+				value,
+			)
 		}
+		builder.WriteString(value.String())
 	}
+
+	return builder.String(), nil
 }
 
 func SubstituteSmartString(file *drive.JsonFile, env Env, path string, value Variable) error {

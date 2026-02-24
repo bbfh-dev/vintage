@@ -48,6 +48,7 @@ func (project *Project) GenerateFromTemplates(errs *errgroup.Group) error {
 				len(template.Definitions),
 			)
 
+			// TODO: No need to include image/audio/etc. files
 			files_to_generate := []string{}
 			for _, folder := range []string{"data", "assets"} {
 				path := filepath.Join(template.Root, folder)
