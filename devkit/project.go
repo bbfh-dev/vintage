@@ -21,6 +21,7 @@ type Project struct {
 	generatorTemplates map[string]*templates.Generator
 	collectorTemplates map[string]*templates.Collector
 	inlineTemplates    map[string]*templates.Inline
+	customTemplates    map[string]*templates.Custom
 
 	libraries []*autolibs.Library
 }
@@ -37,6 +38,7 @@ func New(mcmeta *minecraft.PackMcmeta) *Project {
 		generatorTemplates: map[string]*templates.Generator{},
 		collectorTemplates: map[string]*templates.Collector{},
 		inlineTemplates:    map[string]*templates.Inline{},
+		customTemplates:    map[string]*templates.Custom{},
 
 		libraries: []*autolibs.Library{},
 	}
@@ -61,6 +63,7 @@ func (project *Project) Build() error {
 		pipeline.Async(project.GenerateFromTemplates),
 		project.writeMcfunctions,
 		project.writeGeneratedJsonFiles,
+		project.RunCustomTemplates,
 		// project.CollectFromTemplates,
 		project.LoadAutoLibs,
 		project.ManageAutoLibs,

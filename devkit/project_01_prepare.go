@@ -148,6 +148,14 @@ func (project *Project) LoadTemplates() error {
 			project.collectorTemplates[entry.Name()] = template
 			liblog.Debug(2, "Loaded collector:%s", entry.Name())
 
+		case "custom":
+			template, derr := templates.NewCustom(dir, manifest)
+			if derr != nil {
+				return derr
+			}
+			project.customTemplates[entry.Name()] = template
+			liblog.Debug(2, "Loaded custom:%s", entry.Name())
+
 		default:
 			return &liberrors.DetailedError{
 				Label:   liberrors.ERR_SYNTAX,

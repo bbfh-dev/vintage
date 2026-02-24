@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -168,6 +169,33 @@ func (project *Project) GenerateFromTemplates(errs *errgroup.Group) error {
 }
 
 func (project *Project) CollectFromTemplates() error {
+	return nil
+}
+
+func (project *Project) RunCustomTemplates() error {
+	if project.isDataCached && project.isAssetsCached {
+		return nil
+	}
+
+	liblog.Info(0, "Running %d custom template(s)", len(project.customTemplates))
+
+	for _, template := range project.customTemplates {
+		path := filepath.Join(template.Root, template.Program)
+		cmd := exec.Command(path, project.BuildDir)
+		cmd.Stderr = os.Stderr
+		cmd.Stdout = os.Stdout
+		cmd.Stdin = os.Stdin
+
+		if err := cmd.Run(); err != nil {
+			path = fmt.Sprintf("%s with [%s]", path, project.BuildDir)
+			return &liberrors.DetailedError{
+				Label:   liberrors.ERR_EXECUTE,
+				Context: liberrors.DirContext{Path: path},
+				Details: err.Error(),
+			}
+		}
+	}
+
 	return nil
 }
 
