@@ -1,10 +1,11 @@
 package devkit
 
 import (
-	"archive/zip"
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/klauspost/compress/zip"
 
 	liberrors "github.com/bbfh-dev/lib-errors"
 	liblog "github.com/bbfh-dev/lib-log"
