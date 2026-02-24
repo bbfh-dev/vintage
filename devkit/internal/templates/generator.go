@@ -204,7 +204,7 @@ func (template *Generator) defineUsingIterators(
 			Num:  float64(n),
 		}
 
-		file := file.Clone()
+		file := drive.NewJsonFile(file.Body)
 		if err := code.SubstituteJsonFile(file, env); err != nil {
 			return &liberrors.DetailedError{
 				Label: liberrors.ERR_FORMAT,

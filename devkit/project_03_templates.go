@@ -8,7 +8,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"sync"
 
 	liberrors "github.com/bbfh-dev/lib-errors"
 	liblog "github.com/bbfh-dev/lib-log"
@@ -18,18 +17,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-var GeneratedJsonFiles = map[string]*drive.JsonFile{}
-var mutex sync.Mutex
-
-func mergeGeneratedJsonFile(path string, file *drive.JsonFile) {
-	mutex.Lock()
-	defer mutex.Unlock()
-	if original, ok := GeneratedJsonFiles[path]; ok {
-		original.MergeWith(file)
-	} else {
-		GeneratedJsonFiles[path] = file
-	}
-}
+var GeneratorResults []map[string]*drive.JsonFile
 
 func (project *Project) GenerateFromTemplates(errs *errgroup.Group) error {
 	// TODO: this code needs refactoring
@@ -38,6 +26,8 @@ func (project *Project) GenerateFromTemplates(errs *errgroup.Group) error {
 	}
 
 	liblog.Info(0, "Generating from %d template(s)", len(project.generatorTemplates))
+
+	GeneratorResults = make([]map[string]*drive.JsonFile, 0, len(project.generatorTemplates))
 
 	for _, template := range project.generatorTemplates {
 		errs.Go(func() error {
@@ -83,6 +73,7 @@ func (project *Project) GenerateFromTemplates(errs *errgroup.Group) error {
 			}
 
 			liblog.Debug(2, "Loaded %d files to generate per definition", len(files_to_generate))
+			localMap := make(map[string]*drive.JsonFile)
 
 			for _, definition := range template.Definitions {
 				for _, path := range files_to_generate {
@@ -124,7 +115,11 @@ func (project *Project) GenerateFromTemplates(errs *errgroup.Group) error {
 							}
 						}
 
-						mergeGeneratedJsonFile(dest_path, file)
+						if original, ok := localMap[dest_path]; ok {
+							original.MergeWith(file)
+						} else {
+							localMap[dest_path] = file
+						}
 
 					case ".mcfunction":
 						data := file_cache[path]
@@ -156,12 +151,9 @@ func (project *Project) GenerateFromTemplates(errs *errgroup.Group) error {
 				}
 			}
 
-			liblog.Done(
-				2,
-				"Generated %d file(s)",
-				len(template.Definitions)*len(files_to_generate),
-			)
+			liblog.Done(2, "Generated %d file(s)", len(template.Definitions)*len(files_to_generate))
 
+			GeneratorResults = append(GeneratorResults, localMap)
 			return nil
 		})
 	}
@@ -200,8 +192,20 @@ func (project *Project) RunCustomTemplates() error {
 	return nil
 }
 
-func (project *Project) writeGeneratedJsonFiles() error {
-	for path, file := range GeneratedJsonFiles {
+func (project *Project) writeGeneratedJsonFiles(errs *errgroup.Group) error {
+	merged := make(map[string]*drive.JsonFile)
+	for _, local := range GeneratorResults {
+		for path, file := range local {
+			if original, ok := merged[path]; ok {
+				original.MergeWith(file)
+			} else {
+				merged[path] = file
+			}
+		}
+	}
+	GeneratorResults = nil
+
+	for path, file := range merged {
 		err := os.MkdirAll(filepath.Dir(path), os.ModePerm)
 		if err != nil {
 			return liberrors.NewIO(err, path)
@@ -211,6 +215,8 @@ func (project *Project) writeGeneratedJsonFiles() error {
 		if err != nil {
 			return liberrors.NewIO(err, path)
 		}
+
+		return nil
 	}
 
 	return nil

@@ -80,19 +80,23 @@ func (project *Project) parseFunction(path string) error {
 	return nil
 }
 
-func (project *Project) writeMcfunctions() error {
+func (project *Project) writeMcfunctions(errs *errgroup.Group) error {
 	for path, lines := range mcfunc.Registry {
-		path = filepath.Join(project.BuildDir, "data_pack", path)
+		errs.Go(func() error {
+			path := filepath.Join(project.BuildDir, "data_pack", path)
 
-		err := os.MkdirAll(filepath.Dir(path), os.ModePerm)
-		if err != nil {
-			return liberrors.NewIO(err, path)
-		}
+			err := os.MkdirAll(filepath.Dir(path), os.ModePerm)
+			if err != nil {
+				return liberrors.NewIO(err, path)
+			}
 
-		err = os.WriteFile(path, []byte(strings.Join(lines, "\n")), os.ModePerm)
-		if err != nil {
-			return liberrors.NewIO(err, path)
-		}
+			err = os.WriteFile(path, []byte(strings.Join(lines, "\n")), os.ModePerm)
+			if err != nil {
+				return liberrors.NewIO(err, path)
+			}
+
+			return nil
+		})
 	}
 
 	return nil

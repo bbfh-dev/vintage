@@ -61,8 +61,10 @@ func (project *Project) Build() error {
 		project.GenerateDataPack,
 		project.GenerateResourcePack,
 		pipeline.Async(project.GenerateFromTemplates),
-		project.writeMcfunctions,
-		project.writeGeneratedJsonFiles,
+		pipeline.Async(
+			project.writeMcfunctions,
+			project.writeGeneratedJsonFiles,
+		),
 		project.RunCustomTemplates,
 		// project.CollectFromTemplates,
 		project.LoadAutoLibs,
