@@ -2,7 +2,6 @@ package devkit
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io/fs"
 	"os"
@@ -18,6 +17,16 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+var GeneratedJsonFiles = map[string]*drive.JsonFile{}
+
+func mergeGeneratedJsonFile(path string, file *drive.JsonFile) {
+	if original, ok := GeneratedJsonFiles[path]; ok {
+		original.MergeWith(file)
+	} else {
+		GeneratedJsonFiles[path] = file
+	}
+}
+
 func (project *Project) GenerateFromTemplates(errs *errgroup.Group) error {
 	// TODO: this code needs refactoring
 	if project.isDataCached && project.isAssetsCached {
@@ -28,7 +37,7 @@ func (project *Project) GenerateFromTemplates(errs *errgroup.Group) error {
 
 	for _, template := range project.generatorTemplates {
 		errs.Go(func() error {
-			liblog.Debug(
+			liblog.Info(
 				1,
 				"Generating from %q with %d definition(s)",
 				template.Root,
@@ -106,14 +115,7 @@ func (project *Project) GenerateFromTemplates(errs *errgroup.Group) error {
 							}
 						}
 
-						liblog.Debug(3, "Writing %q", dest_path)
-						err = errors.Join(
-							os.MkdirAll(filepath.Dir(dest_path), os.ModePerm),
-							os.WriteFile(dest_path, file.Formatted(), os.ModePerm),
-						)
-						if err != nil {
-							return liberrors.NewIO(err, path)
-						}
+						mergeGeneratedJsonFile(dest_path, file)
 
 					case ".mcfunction":
 						data, err := os.ReadFile(src_path)
@@ -148,8 +150,34 @@ func (project *Project) GenerateFromTemplates(errs *errgroup.Group) error {
 				}
 			}
 
+			liblog.Done(
+				2,
+				"Generated %d file(s)",
+				len(template.Definitions)*len(files_to_generate),
+			)
+
 			return nil
 		})
+	}
+
+	return nil
+}
+
+func (project *Project) CollectFromTemplates() error {
+	return nil
+}
+
+func (project *Project) writeGeneratedJsonFiles() error {
+	for path, file := range GeneratedJsonFiles {
+		err := os.MkdirAll(filepath.Dir(path), os.ModePerm)
+		if err != nil {
+			return liberrors.NewIO(err, path)
+		}
+
+		err = os.WriteFile(path, file.Formatted(), os.ModePerm)
+		if err != nil {
+			return liberrors.NewIO(err, path)
+		}
 	}
 
 	return nil

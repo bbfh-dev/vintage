@@ -60,6 +60,7 @@ func (project *Project) Build() error {
 		project.GenerateResourcePack,
 		pipeline.Async(project.GenerateFromTemplates),
 		project.writeMcfunctions,
+		project.writeGeneratedJsonFiles,
 		// project.CollectFromTemplates,
 		project.LoadAutoLibs,
 		project.ManageAutoLibs,

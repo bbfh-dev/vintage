@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"slices"
 
+	liblog "github.com/bbfh-dev/lib-log"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/pretty"
 	"github.com/tidwall/sjson"
@@ -91,4 +92,39 @@ var formattingOptions = &pretty.Options{
 
 func (file *JsonFile) Formatted() []byte {
 	return pretty.PrettyOptions(file.Body, formattingOptions)
+}
+
+// Merges top-level JSON keys.
+// Overrides the value with [target] if merging isn't possible (string, number, etc.).
+func (file *JsonFile) MergeWith(target *JsonFile) {
+	for _, key := range target.Get("@keys").Array() {
+		key := key.String()
+		origin_value := file.Get(key)
+		target_value := target.Get(key)
+
+		if !origin_value.Exists() {
+			file.Set(key, target_value.Value())
+			continue
+		}
+
+		if origin_value.IsArray() {
+			items := make([]any, 0, len(origin_value.Array())+len(target_value.Array()))
+			for _, item := range origin_value.Array() {
+				items = append(items, item.Value())
+			}
+			for _, item := range target_value.Array() {
+				items = append(items, item.Value())
+			}
+
+			file.Set(key, items)
+			continue
+		}
+
+		if origin_value.IsObject() {
+			liblog.Debug(2, "WARN: Recursive merging is not implemented, overriding %q", key)
+			continue
+		}
+
+		file.Set(key, target_value.Value())
+	}
 }
