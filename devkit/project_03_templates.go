@@ -72,6 +72,16 @@ func (project *Project) GenerateFromTemplates(errs *errgroup.Group) error {
 				}
 			}
 
+			file_cache := make(map[string][]byte)
+			for _, path := range files_to_generate {
+				src_path := filepath.Join(template.Root, path)
+				data, err := os.ReadFile(src_path)
+				if err != nil {
+					return liberrors.NewIO(err, src_path)
+				}
+				file_cache[path] = data
+			}
+
 			liblog.Debug(2, "Loaded %d files to generate per definition", len(files_to_generate))
 
 			for _, definition := range template.Definitions {
@@ -104,11 +114,7 @@ func (project *Project) GenerateFromTemplates(errs *errgroup.Group) error {
 
 					case ".json":
 						dest_path = filepath.Join(project.BuildDir, dest_folder, dest_path)
-						data, err := os.ReadFile(src_path)
-						if err != nil {
-							return liberrors.NewIO(err, path)
-						}
-
+						data := file_cache[path]
 						file := drive.NewJsonFile(data)
 
 						err = code.SubstituteJsonFile(file, definition.Env)
@@ -123,10 +129,7 @@ func (project *Project) GenerateFromTemplates(errs *errgroup.Group) error {
 						mergeGeneratedJsonFile(dest_path, file)
 
 					case ".mcfunction":
-						data, err := os.ReadFile(src_path)
-						if err != nil {
-							return liberrors.NewIO(err, dest_path)
-						}
+						data := file_cache[path]
 
 						output, err := code.SubstituteString(string(data), definition.Env)
 						if err != nil {
