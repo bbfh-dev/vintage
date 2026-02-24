@@ -4,8 +4,11 @@ import (
 	"bufio"
 
 	liberrors "github.com/bbfh-dev/lib-errors"
+	"github.com/bbfh-dev/vintage/devkit/internal/drive"
 	"github.com/bbfh-dev/vintage/devkit/internal/templates"
 )
+
+var FunctionPool = drive.NewPool[Function](5000, 5000)
 
 type Function struct {
 	Path      string
@@ -14,11 +17,11 @@ type Function struct {
 }
 
 func New(path string, scanner *bufio.Scanner, registry map[string]*templates.Inline) *Function {
-	return &Function{
-		Path:      path,
-		Scanner:   templates.NewBufferedScanner(scanner),
-		Templates: registry,
-	}
+	return FunctionPool.Acquire(func(fn *Function) {
+		fn.Path = path
+		fn.Scanner = templates.NewBufferedScanner(scanner)
+		fn.Templates = registry
+	})
 }
 
 func (fn *Function) MakeErrorContext(line_index uint, line string) liberrors.Context {

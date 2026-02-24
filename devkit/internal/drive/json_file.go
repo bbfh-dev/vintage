@@ -3,7 +3,6 @@ package drive
 import (
 	"fmt"
 	"slices"
-	"sync"
 
 	liblog "github.com/bbfh-dev/lib-log"
 	"github.com/tidwall/gjson"
@@ -11,56 +10,16 @@ import (
 	"github.com/tidwall/sjson"
 )
 
-type JsonFilePool struct {
-	mutex     sync.Mutex
-	pool      []*JsonFile
-	index     int
-	chunkSize int
-}
-
-// Acquire returns a JsonFile with a copy of the given body.
-// The pool grows automatically if more objects are needed.
-func (pool *JsonFilePool) Acquire(body []byte) *JsonFile {
-	pool.mutex.Lock()
-	defer pool.mutex.Unlock()
-
-	// Grow the pool if needed
-	if pool.index >= len(pool.pool) {
-		newPool := make([]*JsonFile, len(pool.pool)+pool.chunkSize)
-		copy(newPool, pool.pool)
-		for i := len(pool.pool); i < len(newPool); i++ {
-			newPool[i] = &JsonFile{}
-		}
-		pool.pool = newPool
-	}
-
-	file := pool.pool[pool.index]
-	pool.index++
-
-	file.Body = body
-	return file
-}
-
-func NewJsonFilePool(initialSize, chunkSize int) *JsonFilePool {
-	p := &JsonFilePool{
-		pool:      make([]*JsonFile, initialSize),
-		index:     0,
-		chunkSize: chunkSize,
-	}
-	for i := range initialSize {
-		p.pool[i] = &JsonFile{}
-	}
-	return p
-}
-
-var Pool = NewJsonFilePool(5000, 5000)
+var JsonFilePool = NewPool[JsonFile](5000, 5000)
 
 type JsonFile struct {
 	Body []byte
 }
 
 func NewJsonFile(body []byte) *JsonFile {
-	return Pool.Acquire(body)
+	return JsonFilePool.Acquire(func(file *JsonFile) {
+		file.Body = body
+	})
 }
 
 func (file *JsonFile) Extension() string {
