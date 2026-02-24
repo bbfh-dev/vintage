@@ -206,17 +206,19 @@ func (project *Project) writeGeneratedJsonFiles(errs *errgroup.Group) error {
 	GeneratorResults = nil
 
 	for path, file := range merged {
-		err := os.MkdirAll(filepath.Dir(path), os.ModePerm)
-		if err != nil {
-			return liberrors.NewIO(err, path)
-		}
+		errs.Go(func() error {
+			err := os.MkdirAll(filepath.Dir(path), os.ModePerm)
+			if err != nil {
+				return liberrors.NewIO(err, path)
+			}
 
-		err = os.WriteFile(path, file.Formatted(), os.ModePerm)
-		if err != nil {
-			return liberrors.NewIO(err, path)
-		}
+			err = os.WriteFile(path, file.Formatted(), os.ModePerm)
+			if err != nil {
+				return liberrors.NewIO(err, path)
+			}
 
-		return nil
+			return nil
+		})
 	}
 
 	return nil
