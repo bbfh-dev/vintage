@@ -15,7 +15,6 @@ import (
 	"github.com/bbfh-dev/vintage/devkit/internal/code"
 	"github.com/bbfh-dev/vintage/devkit/internal/drive"
 	"github.com/bbfh-dev/vintage/devkit/internal/mcfunc"
-	cp "github.com/otiai10/copy"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -86,8 +85,6 @@ func (project *Project) GenerateFromTemplates(errs *errgroup.Group) error {
 
 			for _, definition := range template.Definitions {
 				for _, path := range files_to_generate {
-					src_path := filepath.Join(template.Root, path)
-
 					var dest_folder string
 					if strings.HasPrefix(path, "data") {
 						dest_folder = "data_pack"
@@ -150,7 +147,7 @@ func (project *Project) GenerateFromTemplates(errs *errgroup.Group) error {
 					default:
 						dest_path = filepath.Join(project.BuildDir, dest_folder, dest_path)
 						liblog.Debug(3, "Copying into %q", dest_path)
-						err := cp.Copy(src_path, dest_path)
+						err := os.WriteFile(dest_path, file_cache[path], os.ModePerm)
 						if err != nil {
 							return liberrors.NewIO(err, path)
 						}
