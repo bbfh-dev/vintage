@@ -4,6 +4,8 @@ import (
 	"sync"
 )
 
+const DEFAULT_POOL_SIZE = 5000
+
 type Pool[T any] struct {
 	mutex     sync.Mutex
 	pool      []*T

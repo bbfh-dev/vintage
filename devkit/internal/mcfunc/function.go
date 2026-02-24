@@ -8,7 +8,7 @@ import (
 	"github.com/bbfh-dev/vintage/devkit/internal/templates"
 )
 
-var FunctionPool = drive.NewPool[Function](5000, 5000)
+var FunctionPool = drive.NewPool[Function](drive.DEFAULT_POOL_SIZE, drive.DEFAULT_POOL_SIZE)
 
 type Function struct {
 	Path      string

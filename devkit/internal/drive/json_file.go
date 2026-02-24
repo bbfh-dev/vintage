@@ -10,7 +10,7 @@ import (
 	"github.com/tidwall/sjson"
 )
 
-var JsonFilePool = NewPool[JsonFile](5000, 5000)
+var JsonFilePool = NewPool[JsonFile](DEFAULT_POOL_SIZE, DEFAULT_POOL_SIZE)
 
 type JsonFile struct {
 	Body []byte

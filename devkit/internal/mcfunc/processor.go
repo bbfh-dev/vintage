@@ -8,17 +8,20 @@ import (
 	liberrors "github.com/bbfh-dev/lib-errors"
 	"github.com/bbfh-dev/vintage/devkit/internal"
 	"github.com/bbfh-dev/vintage/devkit/internal/code"
+	"github.com/bbfh-dev/vintage/devkit/internal/drive"
 	"github.com/bbfh-dev/vintage/devkit/internal/templates"
 )
+
+var ProcessorPool = drive.NewPool[Processor](drive.DEFAULT_POOL_SIZE, drive.DEFAULT_POOL_SIZE)
 
 type Processor struct {
 	Function *Function
 }
 
 func NewProcessor(fn *Function) *Processor {
-	return &Processor{
-		Function: fn,
-	}
+	return ProcessorPool.Acquire(func(proc *Processor) {
+		proc.Function = fn
+	})
 }
 
 func (proc *Processor) Build() error {
