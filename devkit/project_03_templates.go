@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	liberrors "github.com/bbfh-dev/lib-errors"
 	liblog "github.com/bbfh-dev/lib-log"
@@ -18,8 +19,11 @@ import (
 )
 
 var GeneratedJsonFiles = map[string]*drive.JsonFile{}
+var mutex sync.Mutex
 
 func mergeGeneratedJsonFile(path string, file *drive.JsonFile) {
+	mutex.Lock()
+	defer mutex.Unlock()
 	if original, ok := GeneratedJsonFiles[path]; ok {
 		original.MergeWith(file)
 	} else {
