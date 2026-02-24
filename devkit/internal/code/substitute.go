@@ -151,51 +151,66 @@ func isSmartValue(value string, variables []string) bool {
 }
 
 func SubstituteJsonFile(file *drive.JsonFile, env Env) error {
-	return SubstituteObject(file, env, "")
+	return SubstituteObject(file, env, "@this")
 }
 
 func SubstituteObject(file *drive.JsonFile, env Env, path string) error {
-	for _, key := range file.Get(join(path, "@keys")).Array() {
-		value := file.Get(join(path, key.String()))
+	obj := file.Get(path)
+	if !obj.IsObject() {
+		return nil
+	}
 
-		// Substitute the key
-		new_key, err := SubstituteString(key.String(), env)
-		if err != nil {
-			return err
-		}
-		if new_key != key.String() {
-			file.Delete(join(path, key.String()))
-			file.Set(join(path, new_key), value.Value())
-		}
+	type changedKey struct {
+		old, new string
+	}
+	var err error
+	var changed_keys []changedKey
+
+	obj.ForEach(func(key, value gjson.Result) bool {
+		key_str := key.String()
+		full_path := join(path, key_str)
 
 		switch value.Type {
 
-		case gjson.Null, gjson.False, gjson.True, gjson.Number:
-			// ignore
-
 		case gjson.String:
-			err := SubstituteSmartString(file, env, join(path, new_key), value)
-			if err != nil {
-				return err
+			err = SubstituteSmartString(file, env, full_path, value)
+
+		case gjson.JSON:
+			if value.IsArray() {
+				err = SubstituteArray(file, env, full_path)
+			} else {
+				err = SubstituteObject(file, env, full_path)
 			}
 
 		default:
-			if value.IsArray() {
-				err := SubstituteArray(file, env, join(path, new_key))
-				if err != nil {
-					return err
-				}
-				continue
-			}
-
-			err := SubstituteObject(file, env, join(path, new_key))
-			if err != nil {
-				return err
-			}
+			// skip
 		}
+
+		if err != nil {
+			return false
+		}
+
+		new_key, sub_err := SubstituteString(key_str, env)
+		if sub_err != nil {
+			err = sub_err
+			return false
+		}
+
+		if new_key != key_str {
+			changed_keys = append(changed_keys, changedKey{key_str, new_key})
+		}
+		return true
+	})
+
+	for _, change := range changed_keys {
+		old_full_path := join(path, change.old)
+		new_full_path := join(path, change.new)
+		value := file.Get(old_full_path).Value()
+		file.Delete(old_full_path)
+		file.Set(new_full_path, value)
 	}
 
-	return nil
+	return err
 }
 
 func SubstituteArray(file *drive.JsonFile, env Env, path string) error {
@@ -229,7 +244,7 @@ func SubstituteArray(file *drive.JsonFile, env Env, path string) error {
 }
 
 func join(path, item string) string {
-	if path == "" {
+	if path == "@this" {
 		return item
 	}
 	return path + "." + item
