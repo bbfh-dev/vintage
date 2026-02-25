@@ -22,7 +22,7 @@ func TestSubstituteString(t *testing.T) {
 	assert.DeepEqual(t, result, "Hello World!")
 }
 
-const SAMPLE_A = `{"test": "%[abc]", "value": [{"id": "%[abc.id]", "c": "Hello %[abc.zzz.c]!"}]}`
+const SAMPLE_A = `{"test": "%[abc]", "value": [{"id": "%[abc.id]", "c": "Hello %[abc.zzz.c]!"}], "deleted": "%[unknown?]"}`
 
 const SAMPLE_A_RESULT = `{"test": {"id": "example", "zzz": {"c": 123}}, "value": [{"id": "example", "c": "Hello 123!"}]}`
 

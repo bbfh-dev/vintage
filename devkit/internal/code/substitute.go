@@ -1,6 +1,7 @@
 package code
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -101,6 +102,8 @@ func SubstituteString(in string, env Env) (string, error) {
 	return builder.String(), nil
 }
 
+var ErrRemoveKey = errors.New("internal.remove_variable")
+
 func SubstituteSmartString(file *drive.JsonFile, env Env, path string, value Variable) error {
 	variables := ExtractVariablesFrom(value.String())
 
@@ -112,6 +115,9 @@ func SubstituteSmartString(file *drive.JsonFile, env Env, path string, value Var
 		file.Set(path, value)
 		return nil
 	}
+
+	is_optional := strings.HasSuffix(variables[0], "?")
+	variables[0] = strings.TrimSuffix(variables[0], "?")
 
 	parts := strings.Split(variables[0], ".")
 	iterator, ok := env.Iterators[parts[0]]
@@ -133,6 +139,9 @@ func SubstituteSmartString(file *drive.JsonFile, env Env, path string, value Var
 
 	value, ok = env.Variables[parts[0]]
 	if !ok {
+		if is_optional {
+			return ErrRemoveKey
+		}
 		return fmt.Errorf("undefined variable %q", variables[0])
 	}
 	if len(parts) == 2 {
@@ -174,6 +183,11 @@ func SubstituteObject(file *drive.JsonFile, env Env, path string) error {
 
 		case gjson.String:
 			err = SubstituteSmartString(file, env, full_path, value)
+			if err == ErrRemoveKey {
+				file.Delete(full_path)
+				err = nil
+				return true
+			}
 
 		case gjson.JSON:
 			if value.IsArray() {
