@@ -112,10 +112,6 @@ func (project *Project) createPackMcmeta(dir, name string, ft minecraft.PackForm
 
 		path := filepath.Join(project.BuildDir, dir, "pack.mcmeta")
 		err := os.WriteFile(path, mcmeta.File.Formatted(), os.ModePerm)
-		if err != nil {
-			return liberrors.NewIO(err, path)
-		}
-
-		return nil
+		return liberrors.NewIO(err, path)
 	}
 }

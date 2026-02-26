@@ -36,14 +36,7 @@ var BuildProgram = libparsex.Program{
 func main() {
 	err := libparsex.Run(&MainProgram, os.Args[1:])
 	if err != nil {
-		switch err := err.(type) {
-		case *liberrors.DetailedError:
-			err.Print(os.Stderr)
-		default:
-			os.Stderr.WriteString(err.Error())
-		}
-
-		os.Stderr.WriteString("\n")
+		liberrors.Print(err, os.Stderr)
 		os.Exit(1)
 	}
 }

@@ -146,27 +146,21 @@ func inlineTemplateUsingSnippet(template *Inline, path string) (*Inline, error) 
 
 func inlineTemplateUsingExec(template *Inline, path string) (*Inline, error) {
 	template.Call = func(out Writer, in Scanner, args []string) error {
-		var stderr bytes.Buffer
 
 		cmd := exec.Command(path, args...)
+
+		var stderr bytes.Buffer
+		cmd.Stderr = &stderr
 		cmd.Stdin = in.Reader()
 		cmd.Stdout = out
-		cmd.Stderr = &stderr
 
 		path := fmt.Sprintf("%s with [%s]", path, strings.Join(args, " "))
 
 		err := cmd.Run()
 		if err != nil {
 			return &liberrors.DetailedError{
-				Label: liberrors.ERR_EXECUTE,
-				Context: liberrors.FileContext{
-					Trace: []liberrors.TraceItem{{Name: path, Col: -1, Row: -1}},
-					Buffer: liberrors.Buffer{
-						FirstLine:   0,
-						Buffer:      "",
-						Highlighted: stderr.String(),
-					},
-				},
+				Label:   liberrors.ERR_EXECUTE,
+				Context: liberrors.NewProgramContext(cmd, stderr.String()),
 				Details: err.Error(),
 			}
 		}

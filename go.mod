@@ -3,7 +3,7 @@ module github.com/bbfh-dev/vintage
 go 1.26
 
 require (
-	github.com/bbfh-dev/lib-errors v1.0.2
+	github.com/bbfh-dev/lib-errors v1.1.2
 	github.com/bbfh-dev/lib-log v0.1.2-beta.2
 	github.com/bbfh-dev/lib-parsex/v3 v3.0.3-beta.1
 	github.com/klauspost/compress v1.18.4

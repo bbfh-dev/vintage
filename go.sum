@@ -1,7 +1,7 @@
 github.com/bbfh-dev/lib-ansi-escapes v0.3.7 h1:BBWSb5qBZ8v3000rmB3ahMpNLRezZcjfxZitehXcKak=
 github.com/bbfh-dev/lib-ansi-escapes v0.3.7/go.mod h1:WXU/UVZMHm3snngvLxj7dIOV/2i0S91p7qAu+MOgdqM=
-github.com/bbfh-dev/lib-errors v1.0.2 h1:MVlBj7OFlAMR3koqQfVNNlY31mTWAnGfgvgMtyhnYfE=
-github.com/bbfh-dev/lib-errors v1.0.2/go.mod h1:EgNvHHwICMOyRPIU+5KKVOUkQ3eab2CXQdZClngwi10=
+github.com/bbfh-dev/lib-errors v1.1.2 h1:EPJm6EPpyAYOkfxv4mK66tSv0DPW/Ojz0Ih14aDh+p4=
+github.com/bbfh-dev/lib-errors v1.1.2/go.mod h1:EgNvHHwICMOyRPIU+5KKVOUkQ3eab2CXQdZClngwi10=
 github.com/bbfh-dev/lib-log v0.1.2-beta.2 h1:JyV++Au/6rfD11I55AV5Iqaaaro7NVPk69825/Jgyqs=
 github.com/bbfh-dev/lib-log v0.1.2-beta.2/go.mod h1:SdSEmLESydHtTE/9fZvcPNppEduDgRIngK1iQQ2ysRI=
 github.com/bbfh-dev/lib-parsex/v3 v3.0.3-beta.1 h1:posaWVwNTawqJ10jJyayLxvOuPu1hoAVrF0Sm8MHbBY=

@@ -99,10 +99,7 @@ func (lib *Library) AddInstalled(filename string) {
 
 func (lib *Library) SaveToDisk() error {
 	err := os.WriteFile(lib.Path, lib.File.Formatted(), os.ModePerm)
-	if err != nil {
-		return liberrors.NewIO(err, lib.Path)
-	}
-	return nil
+	return liberrors.NewIO(err, lib.Path)
 }
 
 func (lib *Library) Install() error {
@@ -228,11 +225,7 @@ func (lib *Library) Download(namespace string) error {
 
 	bar := progressbar.DefaultBytes(response.ContentLength, filename)
 	_, err = io.Copy(io.MultiWriter(file, bar), response.Body)
-	if err != nil {
-		return liberrors.NewIO(err, path)
-	}
-
-	return nil
+	return liberrors.NewIO(err, path)
 }
 
 func getDownloadFilename(url string) string {

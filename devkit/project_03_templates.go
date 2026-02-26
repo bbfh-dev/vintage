@@ -2,6 +2,7 @@ package devkit
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io/fs"
 	"os"
@@ -175,7 +176,9 @@ func (project *Project) RunCustomTemplates() error {
 	for _, template := range project.customTemplates {
 		path := filepath.Join(template.Root, template.Program)
 		cmd := exec.Command(path, project.BuildDir)
-		cmd.Stderr = os.Stderr
+
+		var stderr bytes.Buffer
+		cmd.Stderr = &stderr
 		cmd.Stdout = os.Stdout
 		cmd.Stdin = os.Stdin
 
@@ -183,7 +186,7 @@ func (project *Project) RunCustomTemplates() error {
 			path = fmt.Sprintf("%s with [%s]", path, project.BuildDir)
 			return &liberrors.DetailedError{
 				Label:   liberrors.ERR_EXECUTE,
-				Context: liberrors.DirContext{Path: path},
+				Context: liberrors.NewProgramContext(cmd, stderr.String()),
 				Details: err.Error(),
 			}
 		}
