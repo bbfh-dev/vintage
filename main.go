@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-	"runtime/debug"
 
 	liberrors "github.com/bbfh-dev/lib-errors"
 	libparsex "github.com/bbfh-dev/lib-parsex/v3"
@@ -10,11 +9,9 @@ import (
 	"github.com/bbfh-dev/vintage/devkit"
 )
 
-var Version = getVersion()
-
 var MainProgram = libparsex.Program{
 	Name:        "vintage",
-	Version:     Version,
+	Version:     libparsex.GetVersion(),
 	Description: "Minecraft data-driven vanilla data & resource pack development kit with minimum boilerplate and abstraction.",
 	Options:     &cli.Main.Options,
 	Args:        &cli.Main.Args,
@@ -49,11 +46,4 @@ func main() {
 		os.Stderr.WriteString("\n")
 		os.Exit(1)
 	}
-}
-
-func getVersion() string {
-	if info, ok := debug.ReadBuildInfo(); ok && info.Main.Version != "" {
-		return info.Main.Version
-	}
-	return "(dev)"
 }

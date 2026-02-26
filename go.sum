@@ -4,8 +4,8 @@ github.com/bbfh-dev/lib-errors v1.0.2 h1:MVlBj7OFlAMR3koqQfVNNlY31mTWAnGfgvgMtyh
 github.com/bbfh-dev/lib-errors v1.0.2/go.mod h1:EgNvHHwICMOyRPIU+5KKVOUkQ3eab2CXQdZClngwi10=
 github.com/bbfh-dev/lib-log v0.1.2-beta.2 h1:JyV++Au/6rfD11I55AV5Iqaaaro7NVPk69825/Jgyqs=
 github.com/bbfh-dev/lib-log v0.1.2-beta.2/go.mod h1:SdSEmLESydHtTE/9fZvcPNppEduDgRIngK1iQQ2ysRI=
-github.com/bbfh-dev/lib-parsex/v3 v3.0.2-beta.3 h1:WK1s8B5DrdijQpeBRncgkQxT3j38lqpOmddoIvQyJLM=
-github.com/bbfh-dev/lib-parsex/v3 v3.0.2-beta.3/go.mod h1:Wfs9RPgN2ihPGovylPL1AzJbcX82cb3+XEB8CvNfk9w=
+github.com/bbfh-dev/lib-parsex/v3 v3.0.3-beta.1 h1:posaWVwNTawqJ10jJyayLxvOuPu1hoAVrF0Sm8MHbBY=
+github.com/bbfh-dev/lib-parsex/v3 v3.0.3-beta.1/go.mod h1:Wfs9RPgN2ihPGovylPL1AzJbcX82cb3+XEB8CvNfk9w=
 github.com/chengxilo/virtualterm v1.0.4 h1:Z6IpERbRVlfB8WkOmtbHiDbBANU7cimRIof7mk9/PwM=
 github.com/chengxilo/virtualterm v1.0.4/go.mod h1:DyxxBZz/x1iqJjFxTFcr6/x+jSpqN0iwWCOK1q10rlY=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
