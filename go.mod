@@ -1,6 +1,6 @@
 module github.com/bbfh-dev/vintage
 
-go 1.25.6
+go 1.26
 
 require (
 	github.com/bbfh-dev/lib-errors v1.0.2
