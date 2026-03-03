@@ -72,7 +72,7 @@ func NewGenerator(root string, manifest *drive.JsonFile) (*Generator, error) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		liblog.Warn(2, "%q has no definitions", root)
-		return nil, nil
+		return template, nil
 	}
 
 	var errs errgroup.Group
