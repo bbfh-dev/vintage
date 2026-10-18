@@ -45,6 +45,7 @@ func UsesPluralFolderNames(version string) bool {
 type PackFormats map[string]PackVersion
 
 var ResourcePackFormats = PackFormats{
+	"26.4-snapshot.4":      {Digits: [2]int{100, 1}, Flag: USES_MIN_MAX_FORMAT},
 	"26.4-snapshot.3":      {Digits: [2]int{100, 0}, Flag: USES_MIN_MAX_FORMAT},
 	"26.4-snapshot.2":      {Digits: [2]int{99, 0}, Flag: USES_MIN_MAX_FORMAT},
 	"26.4-snapshot.1":      {Digits: [2]int{98, 0}, Flag: USES_MIN_MAX_FORMAT},
@@ -578,6 +579,7 @@ var ResourcePackFormats = PackFormats{
 }
 
 var DataPackFormats = PackFormats{
+	"26.4-snapshot.4":      {Digits: [2]int{124, 0}, Flag: USES_MIN_MAX_FORMAT},
 	"26.4-snapshot.3":      {Digits: [2]int{123, 0}, Flag: USES_MIN_MAX_FORMAT},
 	"26.4-snapshot.2":      {Digits: [2]int{122, 1}, Flag: USES_MIN_MAX_FORMAT},
 	"26.4-snapshot.1":      {Digits: [2]int{122, 0}, Flag: USES_MIN_MAX_FORMAT},
