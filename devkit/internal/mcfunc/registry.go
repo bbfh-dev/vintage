@@ -25,13 +25,8 @@ func AddLine(path string, line string) error {
 }
 
 func collectNamespaces(line string) {
-	for field := range strings.FieldsSeq(line) {
-		if strings.ContainsAny(field, "@[]=!") {
-			continue
-		}
-		before, after, ok := strings.Cut(field, ":")
-		if ok && after != "" && strings.ToLower(before) == before {
-			UsedNamespaces[strings.TrimPrefix(before, "#")] = 1
-		}
+	after, ok := strings.CutPrefix(line, "#!> include ")
+	if ok {
+		UsedNamespaces[strings.TrimPrefix(after, "#")] = 1
 	}
 }

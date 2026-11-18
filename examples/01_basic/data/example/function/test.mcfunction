@@ -7,6 +7,7 @@ function ./_greet
 		] \
 	}
 
+#!> include bs.math
 execute as @e \
 	at @s \
 	run function bs.math:some_function/here
